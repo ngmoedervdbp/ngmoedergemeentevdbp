@@ -18,6 +18,8 @@ jy sien die skil met leë data. Dit werk **nie** in produksie nie; sien `proxy.t
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Supabase · Vercel
 
+Mobiel-eerste en installeerbaar as PWA — die kerkraad lees dit op selfone.
+
 ## Waar om te begin
 
 - **[CLAUDE.md](CLAUDE.md)** — die besluite: naamgewing, domeinmodel, toegang, ontwerp.

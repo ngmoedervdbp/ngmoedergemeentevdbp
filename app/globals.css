@@ -98,12 +98,17 @@ html {
  */
 @media (pointer: coarse) {
   button:not(.geen-raak-vloer),
+  /* KnopSkakel lewer 'n <a>, nie 'n <button> nie — sonder .knop bly dit onder. */
+  a.knop:not(.geen-raak-vloer),
   [role="tab"],
   a.raak,
   /* Skakels wat 'n ry in 'n lys is, is raakteikens; los teks-skakels binne 'n
      paragraaf uit — dié mag nie die reëlhoogte oprek nie. */
   li > a,
   nav a,
+  /* 'n Skakel wat 'n hele tabelsel vul is net so 'n ry-raakteiken as li > a.
+     Sonder dié reël bly die naam-skakels in Soek en Argief op 31px. */
+  td > a,
   select,
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
   textarea {
@@ -111,7 +116,14 @@ html {
   }
 
   /* Ikoon-alleen knoppies moet ook breed genoeg wees, nie net hoog nie. */
-  button:not(.geen-raak-vloer):has(> svg:only-child) {
+  button:not(.geen-raak-vloer):has(> svg:only-child),
+  a.knop:not(.geen-raak-vloer):has(> svg:only-child) {
+    min-width: 44px;
+  }
+
+  /* Net so vir 'n skakel wat niks anders as 'n avatar bevat nie: sonder 'n
+     breedte-vloer bly die raakteiken so smal soos die avatar self (31px). */
+  a.raak {
     min-width: 44px;
   }
 }

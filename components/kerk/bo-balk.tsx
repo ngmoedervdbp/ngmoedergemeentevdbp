@@ -97,7 +97,7 @@ export function BoBalk({
           <button
             type="button"
             aria-label="Kennisgewings"
-            className="text-ink-muted hover:bg-stage hover:text-ink focus-visible:outline-accent relative flex size-11 items-center justify-center rounded-lg transition-colors focus-visible:outline-2"
+            className="text-ink-muted hover:bg-stage hover:text-ink focus-visible:outline-accent relative flex size-11 min-w-[44px] items-center justify-center rounded-lg transition-colors focus-visible:outline-2"
           >
             <Bell size={18} strokeWidth={1.9} aria-hidden />
             <span className="bg-accent absolute top-2.5 right-3 size-1.5 rounded-full" />

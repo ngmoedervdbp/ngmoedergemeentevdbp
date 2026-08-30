@@ -88,7 +88,7 @@ export function WykAansig({ wyke }: { wyke: WykMetLede[] }) {
                     <div className="mt-auto flex flex-wrap items-center gap-1 px-5 pb-4">
                       {w.lede.slice(0, 5).map((l) => (
                         <Link key={l.id} href={`/lidmate/${l.id}`} title={volleNaam(l)}
-                          className="focus-visible:outline-accent rounded-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2">
+                          className="raak focus-visible:outline-accent flex items-center justify-center rounded-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2">
                           <LidmaatAvatar lid={l} grootte="sm" />
                         </Link>
                       ))}

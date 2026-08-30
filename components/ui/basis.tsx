@@ -7,8 +7,11 @@ import { cn } from "@/lib/utils";
    Knoppie
    --------------------------------------------------------------- */
 
+// `knop` is nie 'n Tailwind-klas nie — dit is 'n haak sodat die raakvloer in
+// globals.css ook 'n KnopSkakel tref. Dié lewer 'n <a>, so die `button`-keurder
+// mis dit en die skakel bly onder 44px op 'n foon.
 const KNOP_BASIS =
-  "inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-[background-color,box-shadow,color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-50";
+  "knop inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-[background-color,box-shadow,color] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-50";
 
 const KNOP_SOORT = {
   primer:

@@ -1,0 +1,260 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   "Glas" — ontwerpstelsel
+   Sien CLAUDE.md § Design.
+
+   Die idee: gebrandskilderde glas. Diep, deurskynende juweeltone teen
+   bleek kalksteen. Kleur is altyd DIEP en gedemp — nooit helder nie.
+   Helder versadigde kleur laat 'n admin-app goedkoop lyk; ou glas
+   gloei van binne af.
+   --------------------------------------------------------------- */
+
+@theme {
+  /* Kalksteen — die binnekant van 'n kerk, nie 'n SaaS-dashboard nie. */
+  --color-ground: #f4f2ed;
+  --color-surface: #ffffff;
+  --color-stage: #eae6dd;
+  --color-ink: #221f26;
+  --color-ink-muted: #6b6570;
+  --color-line: #e1dcd2;
+
+  /* Lood — die donker rame tussen die glaspanele. */
+  --color-lood: #1f1d2b;
+  --color-lood-op: #2b2838;
+  --color-lood-lyn: #38344a;
+
+  --color-brand: #3b3a72;
+  --color-brand-soft: #ecebf4;
+  --color-accent: #a8752b;
+  --color-accent-soft: #f7f0e1;
+
+  /* Glastone. Slegs hierdie ses — moenie nuwes byvoeg sonder gesprek nie. */
+  --color-glas-saffier: #3b3a72;
+  --color-glas-kobalt: #2e4b7c;
+  --color-glas-groen: #2f5a4e;
+  --color-glas-wyn: #77304a;
+  --color-glas-amber: #8f6522;
+  --color-glas-violet: #4e3c69;
+
+  /* Die bleek weergawe van elke toon — lig wat deur die paneel val. */
+  --color-was-saffier: #e2e0f1;
+  --color-was-kobalt: #dce6f2;
+  --color-was-groen: #dbeae5;
+  --color-was-wyn: #f1dfe6;
+  --color-was-amber: #f4e8d0;
+  --color-was-violet: #e7e0f0;
+
+  --font-display: var(--font-spectral), ui-serif, Georgia, serif;
+  --font-sans: var(--font-source-sans), system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * Wortelgrootte is die enigste hefboom vir skaal: Tailwind se tipografie EN
+ * spasiëring is rem-gebaseer, so hierdie een reël vergroot die hele app
+ * eweredig. Moenie px-groottes in komponente hardkodeer nie — dan volg
+ * hulle nie hierdie skaal nie.
+ */
+html {
+  font-size: 17.5px;
+}
+
+/*
+ * Op 'n selfoon is 17.5px te groot: dit stoot elke bladsy horisontaal oor.
+ * Ons draai die een hefboom eerder as om honderde klasse te oorskryf — die
+ * hele app krimp eweredig, presies soos die skaalreël hierbo bedoel is.
+ */
+@media (max-width: 40rem) {
+  html {
+    font-size: 15.5px;
+  }
+}
+
+/*
+ * Keep-veilige areas. `viewport-fit=cover` laat inhoud tot in die afgeronde
+ * hoeke loop; hierdie klasse hou die sybalk, boonste balk en meldings daaruit.
+ */
+.veilig-links {
+  padding-left: env(safe-area-inset-left);
+}
+.veilig-regs {
+  padding-right: env(safe-area-inset-right);
+}
+.veilig-onder {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.veilig-bo {
+  padding-top: env(safe-area-inset-top);
+}
+.veilig-kant {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/*
+ * Raakteikens. WCAG 2.2 (2.5.8) vra 24px; Apple en Google vra 44/48px. Op 'n
+ * toestel sonder fyn wyser gee ons elke knoppie, skakel in 'n lys en
+ * vormveld 'n vloerhoogte, sonder om die rekenaar-uitleg digter te maak.
+ */
+@media (pointer: coarse) {
+  button:not(.geen-raak-vloer),
+  [role="tab"],
+  a.raak,
+  /* Skakels wat 'n ry in 'n lys is, is raakteikens; los teks-skakels binne 'n
+     paragraaf uit — dié mag nie die reëlhoogte oprek nie. */
+  li > a,
+  nav a,
+  select,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  textarea {
+    min-height: 44px;
+  }
+
+  /* Ikoon-alleen knoppies moet ook breed genoeg wees, nie net hoog nie. */
+  button:not(.geen-raak-vloer):has(> svg:only-child) {
+    min-width: 44px;
+  }
+}
+
+/*
+ * iOS Safari zoem die bladsy in wanneer 'n veld met 'n berekende lettergrootte
+ * onder 16px fokus kry — en zoem nooit weer uit nie. Ons wortelgrootte is op 'n
+ * foon 15.5px, so enige `text-sm`-veld sou dit veroorsaak. Een reël hier dek
+ * ook die velde wat nie deur components/ui/vorm.tsx gaan nie.
+ */
+@media (max-width: 40rem) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Moenie momentum-rol op iOS binne panele verloor nie. */
+.rol-x {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+}
+
+/*
+ * Versteek 'n rolstaaf sonder om rol te verhinder.
+ *
+ * `overflow-x: auto` laat overflow-y as `auto` bereken (die spesifikasie laat
+ * nie een as `visible` en die ander nie). 'n Enkele pixel se oorloop — soos
+ * 'n -mb-px op 'n oortjie — gee dan 'n nuttelose vertikale rolstaaf.
+ */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Getalle in kolomme moet belyn — lidmaattellings, ouderdomme, datums. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------
+   Lansetboog — die spits kerkvensterboog.
+   Ons handtekeningvorm. Gebruik dit spaarsaam: die logo, ikoonhouers,
+   leë toestande. Nie op elke kaart nie.
+   --------------------------------------------------------------- */
+
+.boog {
+  clip-path: path(
+    "M10 78 L10 38 Q10 10 32 4 Q54 10 54 38 L54 78 Z"
+  );
+}
+
+/* Vir houers van enige grootte — 'n boog met reguit kante en spits kruin. */
+.boog-vorm {
+  border-radius: 46% 46% 12% 12% / 34% 34% 6% 6%;
+}
+
+/* ---------------------------------------------------------------
+   Kruis-laaier
+   Trek  — roete-oorgange, volblad
+   Kring — knoppies, kaarte, inlyn
+   --------------------------------------------------------------- */
+
+@keyframes kruis-stem {
+  0% {
+    stroke-dashoffset: 52;
+  }
+  30%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes kruis-arm {
+  0%,
+  24% {
+    stroke-dashoffset: 19;
+  }
+  52%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes kruis-cycle {
+  0%,
+  76% {
+    opacity: 1;
+  }
+  92%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes kruis-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.kruis-trek g {
+  animation: kruis-cycle 2.8s ease-in-out infinite;
+}
+
+.kruis-trek .stem {
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+  animation: kruis-stem 2.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.kruis-trek .arm-l,
+.kruis-trek .arm-r {
+  stroke-dasharray: 19;
+  stroke-dashoffset: 19;
+  animation: kruis-arm 2.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.kruis-kring .ring {
+  stroke-dasharray: 46 130;
+  transform-origin: 32px 32px;
+  animation: kruis-spin 1.15s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kruis-trek g,
+  .kruis-trek .stem,
+  .kruis-trek .arm-l,
+  .kruis-trek .arm-r,
+  .kruis-kring .ring {
+    animation: none;
+  }
+  .kruis-trek .stem,
+  .kruis-trek .arm-l,
+  .kruis-trek .arm-r {
+    stroke-dashoffset: 0;
+  }
+}

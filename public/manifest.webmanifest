@@ -1,0 +1,12 @@
+{
+  "name": "Lidmaatbestuur · NG Moedergemeente",
+  "short_name": "Lidmaatbestuur",
+  "description": "Lidmaatbestuur vir die kerkraad van NG Vanderbijlpark Moedergemeente.",
+  "lang": "af",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f3",
+  "theme_color": "#4f46e5",
+  "icons": []
+}

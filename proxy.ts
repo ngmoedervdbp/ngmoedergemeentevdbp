@@ -33,10 +33,22 @@ export async function proxy(request: NextRequest) {
     // VERCEL_ENV (voorskou = demo), maar die demo loop op die produksie-
     // ontplooiing self, so daardie afleiding is verkeerd. 'n Uitdruklike vlag
     // sê presies wat bedoel word en werk ongeag waar dit ontplooi word.
-    if (process.env.DEMO_MODUS !== "true") {
+    // Aanvaar beide spellings: DEMO_MODUS is Afrikaans, maar DEMO_MODE tik
+    // homself maklik in en 'n stil tikfout hier lyk presies soos 'n stukkende
+    // ontplooiing. Aanvaar ook "1" langs "true".
+    const demoVlag = process.env.DEMO_MODUS ?? process.env.DEMO_MODE;
+    const demoModus = demoVlag === "true" || demoVlag === "1";
+
+    if (!demoModus) {
+      // Wys wat die proses werklik sien, sodat 'n verkeerde omgewing-omvang
+      // (Preview i.p.v. Production) of 'n vergete herontplooiing dadelik
+      // sigbaar is in die Vercel-log, eerder as net "Internal Server Error".
       throw new Error(
         "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY moet gestel wees. " +
-          "Stel DEMO_MODUS=true om sonder Supabase op spotdata te loop.",
+          "Stel DEMO_MODUS=true om sonder Supabase op spotdata te loop. " +
+          `Gesien: DEMO_MODUS=${JSON.stringify(process.env.DEMO_MODUS)}, ` +
+          `DEMO_MODE=${JSON.stringify(process.env.DEMO_MODE)}, ` +
+          `VERCEL_ENV=${JSON.stringify(process.env.VERCEL_ENV)}.`,
       );
     }
     // Demo-modus: laat die skil deur sodat die kerkraad die spotdata kan sien.

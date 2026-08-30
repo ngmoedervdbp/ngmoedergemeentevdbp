@@ -25,26 +25,26 @@ export async function proxy(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !anonKey) {
-    // In eintlike produksie is 'n ontbrekende sleutel 'n foutiewe ontplooiing,
-    // nie 'n rede om die app onbeskermd te laat loop nie.
+    // 'n Ontbrekende sleutel is normaalweg 'n foutiewe ontplooiing, nie 'n rede
+    // om die app onbeskermd te laat loop nie — behalwe wanneer ons doelbewus 'n
+    // demo op spotdata wys.
     //
-    // `VERCEL_ENV` is "production" slegs vir die produksie-ontplooiing self;
-    // voorskou-ontplooiings kry "preview" en plaaslik is dit ongestel. Ons toets
-    // daarop eerder as op NODE_ENV, wat op Vercel altyd "production" is — ook
-    // vir voorskoue. Sonder hierdie onderskeid gooi elke voorskou-versoek en
-    // die demo wys 'n 500 in plaas van die app.
-    if (process.env.VERCEL_ENV === "production") {
+    // Dit moet 'n EKSPLISIETE keuse wees. Ons het probeer om dit af te lei uit
+    // VERCEL_ENV (voorskou = demo), maar die demo loop op die produksie-
+    // ontplooiing self, so daardie afleiding is verkeerd. 'n Uitdruklike vlag
+    // sê presies wat bedoel word en werk ongeag waar dit ontplooi word.
+    if (process.env.DEMO_MODUS !== "true") {
       throw new Error(
-        "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY moet gestel wees.",
+        "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY moet gestel wees. " +
+          "Stel DEMO_MODUS=true om sonder Supabase op spotdata te loop.",
       );
     }
-    // Plaaslik en op voorskou-ontplooiings, voor Supabase gekoppel is, laat die
-    // skil deur sodat die kerkraad die spotdata kan sien.
+    // Demo-modus: laat die skil deur sodat die kerkraad die spotdata kan sien.
     //
-    // LET WEL: hierdie tak laat 'n voorskou-ontplooiing sonder verifikasie loop.
-    // Dit is net veilig solank die app op spotdata staan. Sodra werklike
-    // lidmaatdata inkom, moet Vercel se Deployment Protection aan wees — anders
-    // is dit 'n POPIA-oortreding. Verwyder die tak sodra auth gekoppel is.
+    // LET WEL: hierdie tak laat die app SONDER verifikasie loop en is publiek
+    // bereikbaar. Dit is net veilig solank die app op spotdata staan. Sodra
+    // werklike lidmaatdata inkom, moet DEMO_MODUS af wees — anders is dit 'n
+    // POPIA-oortreding. Verwyder die tak sodra auth gekoppel is.
     if (!gewaarsku) {
       console.warn(
         "\n   Geen Supabase-omgewingsveranderlikes nie — verifikasie is AFGESKAKEL.\n" +

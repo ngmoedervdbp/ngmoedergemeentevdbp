@@ -25,42 +25,25 @@ export async function proxy(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !anonKey) {
-    // 'n Ontbrekende sleutel is normaalweg 'n foutiewe ontplooiing, nie 'n rede
-    // om die app onbeskermd te laat loop nie — behalwe wanneer ons doelbewus 'n
-    // demo op spotdata wys.
+    // TYDELIKE AFWYKING — sien CLAUDE.md, "Dev-only auth bypass".
     //
-    // Dit moet 'n EKSPLISIETE keuse wees. Ons het probeer om dit af te lei uit
-    // VERCEL_ENV (voorskou = demo), maar die demo loop op die produksie-
-    // ontplooiing self, so daardie afleiding is verkeerd. 'n Uitdruklike vlag
-    // sê presies wat bedoel word en werk ongeag waar dit ontplooi word.
-    // Aanvaar beide spellings: DEMO_MODUS is Afrikaans, maar DEMO_MODE tik
-    // homself maklik in en 'n stil tikfout hier lyk presies soos 'n stukkende
-    // ontplooiing. Aanvaar ook "1" langs "true".
-    const demoVlag = process.env.DEMO_MODUS ?? process.env.DEMO_MODE;
-    const demoModus = demoVlag === "true" || demoVlag === "1";
-
-    if (!demoModus) {
-      // Wys wat die proses werklik sien, sodat 'n verkeerde omgewing-omvang
-      // (Preview i.p.v. Production) of 'n vergete herontplooiing dadelik
-      // sigbaar is in die Vercel-log, eerder as net "Internal Server Error".
-      throw new Error(
-        "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY moet gestel wees. " +
-          "Stel DEMO_MODUS=true om sonder Supabase op spotdata te loop. " +
-          `Gesien: DEMO_MODUS=${JSON.stringify(process.env.DEMO_MODUS)}, ` +
-          `DEMO_MODE=${JSON.stringify(process.env.DEMO_MODE)}, ` +
-          `VERCEL_ENV=${JSON.stringify(process.env.VERCEL_ENV)}.`,
-      );
-    }
-    // Demo-modus: laat die skil deur sodat die kerkraad die spotdata kan sien.
+    // Hier het vroeër 'n `throw` gestaan wanneer die Supabase-sleutels ontbreek.
+    // Dit is verwyder omdat die app nog HEELTEMAL op spotdata (lib/mock/) loop:
+    // 'n ontbrekende sleutel is op hierdie stadium die normale toestand, nie 'n
+    // stukkende ontplooiing nie, en die throw het die hele demo 500 laat gee.
     //
-    // LET WEL: hierdie tak laat die app SONDER verifikasie loop en is publiek
-    // bereikbaar. Dit is net veilig solank die app op spotdata staan. Sodra
-    // werklike lidmaatdata inkom, moet DEMO_MODUS af wees — anders is dit 'n
-    // POPIA-oortreding. Verwyder die tak sodra auth gekoppel is.
+    // 'n DEMO_MODUS-vlag is probeer, maar die veranderlike bereik nie die
+    // funksie op Vercel nie, so die app is eerder onvoorwaardelik deurgelaat.
+    //
+    // MOET HERSTEL WORD sodra Supabase gekoppel is. Op daardie punt is 'n
+    // ontbrekende sleutel wel 'n foutiewe ontplooiing en moet dit hard faal —
+    // anders loop 'n werf met werklike lidmaatdata sonder verifikasie, wat 'n
+    // POPIA-oortreding is. Tot dan: hou Vercel se Deployment Protection aan as
+    // die skakel nie publiek mag wees nie.
     if (!gewaarsku) {
       console.warn(
         "\n   Geen Supabase-omgewingsveranderlikes nie — verifikasie is AFGESKAKEL.\n" +
-          "   Kopieer .env.local.example na .env.local om dit aan te skakel.\n",
+          "   Die app loop op spotdata. Herstel die wag sodra auth gekoppel is.\n",
       );
       gewaarsku = true;
     }

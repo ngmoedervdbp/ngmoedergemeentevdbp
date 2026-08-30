@@ -25,15 +25,26 @@ export async function proxy(request: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !anonKey) {
-    // In produksie is 'n ontbrekende sleutel 'n foutiewe ontplooiing, nie 'n
-    // rede om die app onbeskermd te laat loop nie.
-    if (process.env.NODE_ENV === "production") {
+    // In eintlike produksie is 'n ontbrekende sleutel 'n foutiewe ontplooiing,
+    // nie 'n rede om die app onbeskermd te laat loop nie.
+    //
+    // `VERCEL_ENV` is "production" slegs vir die produksie-ontplooiing self;
+    // voorskou-ontplooiings kry "preview" en plaaslik is dit ongestel. Ons toets
+    // daarop eerder as op NODE_ENV, wat op Vercel altyd "production" is — ook
+    // vir voorskoue. Sonder hierdie onderskeid gooi elke voorskou-versoek en
+    // die demo wys 'n 500 in plaas van die app.
+    if (process.env.VERCEL_ENV === "production") {
       throw new Error(
         "NEXT_PUBLIC_SUPABASE_URL en NEXT_PUBLIC_SUPABASE_ANON_KEY moet gestel wees.",
       );
     }
-    // Plaaslik, voor Supabase gekoppel is, laat die skil deur sodat daar iets
-    // is om te sien. Verwyder hierdie tak nooit sonder die produksie-wag hierbo nie.
+    // Plaaslik en op voorskou-ontplooiings, voor Supabase gekoppel is, laat die
+    // skil deur sodat die kerkraad die spotdata kan sien.
+    //
+    // LET WEL: hierdie tak laat 'n voorskou-ontplooiing sonder verifikasie loop.
+    // Dit is net veilig solank die app op spotdata staan. Sodra werklike
+    // lidmaatdata inkom, moet Vercel se Deployment Protection aan wees — anders
+    // is dit 'n POPIA-oortreding. Verwyder die tak sodra auth gekoppel is.
     if (!gewaarsku) {
       console.warn(
         "\n   Geen Supabase-omgewingsveranderlikes nie — verifikasie is AFGESKAKEL.\n" +

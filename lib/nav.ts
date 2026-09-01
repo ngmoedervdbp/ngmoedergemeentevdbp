@@ -4,6 +4,7 @@ import {
   BookOpen,
   Calendar,
   FileText,
+  HeartHandshake,
   LayoutDashboard,
   MapPin,
   MessageSquare,
@@ -29,6 +30,7 @@ export type NavItem = {
 export const NAV: NavItem[] = [
   { etiket: "Dashboard", href: "/dashboard", ikoon: LayoutDashboard },
   { etiket: "Lidmate", href: "/lidmate", ikoon: Users },
+  { etiket: "Bediening", href: "/bediening", ikoon: HeartHandshake },
   { etiket: "Kalender", href: "/kalender", ikoon: Calendar },
   { etiket: "Verslae", href: "/verslae", ikoon: BarChart3 },
   { etiket: "Dokumentasie", href: "/dokumentasie", ikoon: FileText },

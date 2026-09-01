@@ -16,6 +16,24 @@ export const GLAS = {
   wyn: "#77304a",
   amber: "#8f6522",
   violet: "#4e3c69",
+  terra: "#8a4a32",
+  see: "#2a5c66",
+  roos: "#8d3f5e",
+  olyf: "#5a5c2e",
 } as const;
 
-export const GLAS_REEKS = Object.values(GLAS);
+export type GlasToon = keyof typeof GLAS;
+
+/**
+ * Die oorspronklike ses, vir grafiekreekse waar 'n vaste, bekende volgorde
+ * saak maak. Die vier nuwes is vir Bediening Opsporing se tien tipes en hoort
+ * nie in 'n algemene reeks nie.
+ */
+export const GLAS_REEKS = [
+  GLAS.saffier,
+  GLAS.kobalt,
+  GLAS.groen,
+  GLAS.wyn,
+  GLAS.amber,
+  GLAS.violet,
+];

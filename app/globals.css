@@ -29,13 +29,25 @@
   --color-accent: #a8752b;
   --color-accent-soft: #f7f0e1;
 
-  /* Glastone. Slegs hierdie ses — moenie nuwes byvoeg sonder gesprek nie. */
+  /* Glastone.
+   *
+   * Die eerste ses is die oorspronklike stel. Vier is bygevoeg vir Bediening
+   * Opsporing, wat tien aktiwiteitstipes het wat elk apart leesbaar moet wees
+   * in 'n kalenderlegende — ses kon dit nie dra nie.
+   *
+   * Die reël bly onveranderd en is die enigste wat saak maak: diep en gedemp,
+   * nooit helder nie. Elke nuwe toon is teen die bestaandes gemeet, nie op sy
+   * eie gekies nie. Voeg nie 'n elfde by sonder dieselfde toets nie. */
   --color-glas-saffier: #3b3a72;
   --color-glas-kobalt: #2e4b7c;
   --color-glas-groen: #2f5a4e;
   --color-glas-wyn: #77304a;
   --color-glas-amber: #8f6522;
   --color-glas-violet: #4e3c69;
+  --color-glas-terra: #8a4a32;  /* gebrande aarde */
+  --color-glas-see: #2a5c66;    /* diep seegroen-blou */
+  --color-glas-roos: #8d3f5e;   /* gedempte oudrooskwarts */
+  --color-glas-olyf: #5a5c2e;   /* olyfblaar */
 
   /* Die bleek weergawe van elke toon — lig wat deur die paneel val. */
   --color-was-saffier: #e2e0f1;
@@ -44,6 +56,10 @@
   --color-was-wyn: #f1dfe6;
   --color-was-amber: #f4e8d0;
   --color-was-violet: #e7e0f0;
+  --color-was-terra: #f2e0d8;
+  --color-was-see: #d8e8ea;
+  --color-was-roos: #f2dee6;
+  --color-was-olyf: #e6e7d3;
 
   --font-display: var(--font-spectral), ui-serif, Georgia, serif;
   --font-sans: var(--font-source-sans), system-ui, -apple-system, sans-serif;

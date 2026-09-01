@@ -116,3 +116,32 @@ export function ouderdomsgroepVan(ouderdom: number | null): Ouderdomsgroep | nul
 export function fmtOuderdom(ouderdom: number | null) {
   return ouderdom === null ? "—" : `${ouderdom} jr`;
 }
+
+/**
+ * `14:30` uit 'n Postgres `time`-waarde ("14:30:00").
+ *
+ * `fmtTyd` hierbo verwag 'n volle datum; 'n kaal tydsnaar het geen datum om
+ * mee te begin nie, en dit deur `new Date()` te stuur gee 'n ongeldige datum.
+ */
+export function fmtKlok(waarde: string | null | undefined) {
+  if (!waarde) return "—";
+  const [u, m] = waarde.split(":");
+  if (u === undefined || m === undefined) return "—";
+  return `${u.padStart(2, "0")}:${m}`;
+}
+
+/** `14:30 – 15:15`, of net die begintyd waar daar geen einde is nie. */
+export function fmtTydreeks(
+  begin: string | null | undefined,
+  eind: string | null | undefined,
+) {
+  if (!begin) return "—";
+  return eind ? `${fmtKlok(begin)} – ${fmtKlok(eind)}` : fmtKlok(begin);
+}
+
+/** `1,5 uur` / `45 min` — die duur van 'n aktiwiteit. */
+export function fmtDuur(ure: number | null | undefined) {
+  if (ure === null || ure === undefined) return "—";
+  if (ure < 1) return `${Math.round(ure * 60)} min`;
+  return `${getal.format(Math.round(ure * 10) / 10)} uur`;
+}

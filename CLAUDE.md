@@ -1,15 +1,25 @@
-# NG Vanderbijlpark Moedergemeente — Lidmaatbestuur
+# NG Vanderbijlpark Moedergemeente
 
-Member-management app for the kerkraad. Replaces a Base44 prototype that stored
-everything in Google Sheets.
+Two things in one codebase:
+
+1. **A public website** for the congregation and the wider community — the front door.
+2. **Lidmaatbestuur**, the member-management app for the kerkraad, behind an admin login.
+
+Replaces a Base44 prototype that stored everything in Google Sheets.
 
 Full page-by-page inventory of the app we're replacing: `docs/base44-reference/notes.md`.
 
-> **Status: MVP op spotdata.** All twelve pages are built and navigable against a mock
-> dataset in `lib/mock/`. **There is still no database.** Every page reads from
+> **Status: MVP op spotdata.** All twelve *admin* pages are built and navigable against a
+> mock dataset in `lib/mock/`. **There is still no database.** Every page reads from
 > `lib/mock/index.ts`, whose query helpers deliberately mirror the shape a Supabase
 > query will return, so swapping them out is mechanical. Buttons that would mutate
 > (Stoor, Keur goed, Heraktiveer, Laai op) are inert.
+>
+> SQL migrations exist in `supabase/migrations/` but **have never been run** — no
+> local Postgres, no linked project. Treat them as a draft schema, not as truth.
+>
+> **The public website and the ministry tracker are not built yet.** See "Scope — the
+> three parts" below; both are planned, neither is designed.
 
 ## Stack
 
@@ -109,7 +119,10 @@ directly in the DB: `aktief | onaktief | oorgeplaas | oorlede`, `manlik | vrouli
 | Lidmaat / lidmate | Member(s) of the congregation |
 | Gesin / gesinne | Household |
 | Wyk / wyke | Ward. Geographic subdivision; each may have a wyksouderling. Numbered as **strings** — `1`, `30 A`, `38 A` |
-| Kerkraad | Church council — our entire user base |
+| Kerkraad | Church council — the admin app's user base |
+| Dominee | Minister / pastor. Has his own ministry tracker (see Scope) |
+| Besoek | Visit — pastoral. `hospitaalbesoek`, `huisbesoek` |
+| Preekbeurt | Preaching engagement — which church he speaks at, and when |
 | Ouderling | Elder |
 | Skriba | Secretary — usually the person doing data entry |
 | Kategese | Sunday school / catechism classes |
@@ -118,7 +131,96 @@ directly in the DB: `aktief | onaktief | oorgeplaas | oorlede`, `manlik | vrouli
 | Verjaarsdag | Birthday — the app surfaces these prominently |
 | Aantekeninge | Notes |
 
+## Scope — the three parts
+
+The project grew past "member management". Three distinct surfaces, one codebase, one
+database:
+
+### 1. Public website — the community front door
+
+**Not built yet.** Anyone can reach it, no login. This is the part the wider community
+sees, so **UI design carries real weight here** — it is a shopfront, not an admin form.
+
+- It reads published content only. It must never expose lidmaat PII — no member lists,
+  no birthdays, no contact details, no pastoral notes. That data lives behind the login.
+- The registration form moves *into* this site rather than being a lone public route.
+- Content (service times, news, sermons, events shown publicly) needs its own tables with
+  an explicit `published` flag. **Never surface an admin table directly** — a public event
+  and a kerkraad diary entry are different things even if they share a date.
+- Prefer static generation and caching; this is the only part that takes real traffic.
+
+**The "Glas" design language below was drawn for the admin app.** How much of it carries
+to a public site is an open question — the dark lead sidebar in particular is an admin
+frame, not a homepage. Ask before deciding.
+
+### 2. Lidmaatbestuur — the admin app
+
+Everything currently in `app/(dash)/`. Gated behind the admin login. This is what the
+twelve existing pages and `supabase/migrations/` cover.
+
+### 3. Bediening Opsporing — the Dominee's own tool
+
+**Schema written (013–018), UI not built.** Full inventory of his Base44 demo:
+`docs/base44-reference/bediening-opsporing.md`. That file is the source of truth for
+these tables — don't add fields it doesn't record.
+
+Five tabs in the original: **Aktiwiteite · Verslae · Ligging · Kalender · Sinkroniseer**,
+plus a separate **Afsprake Bestuur** screen.
+
+- **Aktiwiteite** — ten types (tuisbesoek, hospitaalbesoek, begrafnis, vergadering,
+  preek, berading, doop, troue, bybelstudie, ander). Title is free text, so it works for
+  a non-member; `lid_id` links it to a real lidmaat where there is one.
+- **Verslae** — computed only: Totale Ure sums `ure`, Liggings counts distinct places.
+  Exports to Print / Word / PDF.
+- **Afsprake** — six statuses stored, four shown as filters (Aktief = goedgekeur +
+  herskeduleer). **The demo had zero appointments, so those fields are inferred** — ask
+  the Dominee before building the form.
+- **Sinkroniseer** — reads a published iCloud calendar (`ikal_url`). That URL contains a
+  secret token; never expose it.
+
+**Two traps specific to this:**
+
+- **"Lidmaat Tipe" here is not `lede.tipe`.** In the tracker it means bestaande vs nuwe
+  contact; in the main app it means belydend vs doop. Same words, different enums — they
+  must never be merged.
+- **`ure` is a generated column**, not something the app computes. That guarantees the
+  report total can never disagree with the rows, which is exactly the Base44 bug we
+  already fixed once for ages.
+
+**Privacy — this is the strictest part of the project.** Pastoral work is confidential: a
+hospitaalbesoek reveals an illness, a berading reveals a crisis. RLS in `017` is therefore
+**owner-only** — not the kerkraad, not admin — which deliberately differs from `011`.
+If the gemeente later wants visit *statistics* for the kerkraad, add an aggregate view
+that returns counts only. Do not loosen those policies.
+
+> **Location tracking is the heaviest POPIA item in the codebase.** The demo has an
+> "Outomaties elke 5 minute naspoor" toggle — continuous tracking of a real person.
+> `016` defaults it off, requires a recorded consent timestamp (enforced by a CHECK, not
+> by the UI), and sets a 90-day retention. Confirm that retention with him; it's a
+> placeholder. Never switch tracking on programmatically.
+
+## Roles & permissions
+
+**The current `admin | kerkraad` split is not enough** and will be replaced. The
+requirement is per-role visibility and edit rights — who can see what, who can change what.
+
+Known roles so far: admin, dominee, skriba, ouderling, plain kerkraad member. Not yet
+decided:
+
+- Whether wyksouderlinge are scoped to their own wyk (was already open before this).
+- Whether the Dominee's visit notes are private to him (see above — assume yes).
+- Whether roles are a fixed enum or a permission table. Prefer an enum until there is a
+  real need for per-user grants; a permissions table nobody edits is just a slower enum.
+
+`profiles.rol` in `010_create_table_profiles.sql` is a placeholder. When this lands it
+needs a migration, and **every RLS policy in `011_enable_rls.sql` must be revisited** —
+they currently say "any kerkraad member can read and write everything", which is exactly
+what this section replaces.
+
 ## Domain model
+
+> Covers part 2 (the admin app) only. The public site and ministry tracker are not
+> modelled yet — see Scope.
 
 Core hierarchy: **wyk → family → lid**, with kategese groups cutting across.
 
@@ -144,11 +246,17 @@ Detailed confirmed field list: see `docs/base44-reference/notes.md`.
 
 ## Auth & access
 
-- **Kerkraad members only. No lidmaat accounts.** Invite-only; no public signup.
-- **Exactly one public, unauthenticated route: the registration form.** New lidmate reach
-  it via a shared link / QR code at the church entrance. It is public write-only —
-  submissions land in a moderation queue (`pending_registrations` or
-  `lede.status = 'wag_goedkeuring'`) and a kerkraad member approves them.
+> **Changed with the public website.** This section used to say "exactly one public
+> route". That is no longer true: the whole public site is unauthenticated. The rule that
+> survives is narrower and more important — **no public route may ever read lidmaat PII.**
+
+- **Accounts are for kerkraad and the Dominee only. No lidmaat accounts.** Invite-only;
+  no public signup. The public site has no login at all.
+- **The public site is read-only and reads published content only.** It never touches
+  `lede`, `families`, `wyke` or anything with personal data in it.
+- **The registration form is the one public *write*.** New lidmate reach it via a shared
+  link / QR code at the church entrance. It is write-only — submissions land in a
+  moderation queue (`pending_registrations`) and a kerkraad member approves them.
   - This route needs rate limiting, a spam guard, and strict Zod validation. It is the
     app's only attack surface and it accepts PII from anonymous users. Treat it as hostile input.
   - It must never read data back — only insert.
@@ -157,8 +265,8 @@ Detailed confirmed field list: see `docs/base44-reference/notes.md`.
 - **RLS on every table, no exceptions.**
 - The service-role key is server-only. Never in a Client Component, never in a
   `NEXT_PUBLIC_*` var. This is why we chose Next.js over a pure SPA.
-- Roles: `admin` and standard kerkraad user at minimum — Base44's Admin page hard-gates on
-  admin. Whether wyksouderlinge should be scoped to their own wyk is still open.
+- Roles: see **Roles & permissions** above. The current `admin | kerkraad` split is a
+  placeholder and is being replaced by real per-role visibility and edit rights.
 
 ## Design — "Glas"
 
@@ -308,9 +416,10 @@ older congregation; never add `maximum-scale`.
 ```
 proxy.ts                    # auth gate + session refresh (NOT middleware.ts)
 app/
-  (publiek)/registreer/     # the ONLY public route
-  (auth)/teken-in/
-  (dash)/
+  (publiek)/registreer/     # public write-only — the moderation queue
+                            # the public WEBSITE will live alongside this (not built)
+  (auth)/teken-in/          # admin login
+  (dash)/                   # everything below here is behind that login
     layout.tsx              # sidebar shell
     loading.tsx             # Trek kruis-laaier
     dashboard/  lidmate/  gesinne/  wyke/
@@ -334,7 +443,12 @@ lib/
   utils.ts                  # cn()
   supabase/{client,server}.ts
   database.types.ts         # generated — never hand-edit
-supabase/migrations/        # not created yet
+supabase/migrations/        # 001-018, one concern per file. Parse-checked against a real
+                            # Postgres parser, but NEVER RUN against a database.
+                            #   001-012  admin app (wyke, families, lede, …)
+                            #   013-018  Bediening Opsporing (die Dominee)
+                            # Filenames are 001_… not Supabase's <timestamp>_… convention;
+                            # rename if you intend to use `supabase db push`.
 docs/base44-reference/      # screenshots + inventory of the app we're replacing
 ```
 

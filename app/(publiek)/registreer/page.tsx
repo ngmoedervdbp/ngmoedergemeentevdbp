@@ -1,41 +1,39 @@
 import type { Metadata } from "next";
-import { GlasBoog } from "@/components/kerk/glas-boog";
+import { PubliekKop } from "@/components/publiek/bladsy-kop";
+import { RegistreerVorm } from "./registreer-vorm";
 
-export const metadata: Metadata = { title: "Registreer as lidmaat" };
+export const metadata: Metadata = {
+  title: "Word deel van ons",
+  description:
+    "Laat jou besonderhede by die NG Moedergemeente Vanderbijlpark en die kerkkantoor tree met jou in verbinding.",
+};
 
 /**
- * DIE ENIGSTE PUBLIEKE ROETE.
+ * DIE APP SE ENIGSTE PUBLIEKE SKRYFROETE.
  *
- * Onbekende besoekers bereik hierdie bladsy via 'n QR-kode by die kerk se
- * ingang of 'n skakel in 'n WhatsApp-groep. Dit is skryf-alleen: dit skep 'n
- * inskrywing in die goedkeuringsry en lees NOOIT lidmaatdata terug nie.
- *
- * Voor dit regtig oopgaan, benodig dit:
- *   - streng Zod-validasie op die bediener
- *   - tempo-beperking per IP
- *   - 'n gemorswag (honeypot of Turnstile)
- * Sien CLAUDE.md § Auth & access.
+ * Onbekende besoekers bereik dit via die werf, 'n QR-kode by die ingang, of 'n
+ * skakel in 'n WhatsApp-groep. Dit skep 'n inskrywing in die moderasietou en
+ * lees NOOIT lidmaatdata terug nie. Sien CLAUDE.md § Auth & access.
  */
 export default function RegistreerBladsy() {
   return (
-    <div className="flex min-h-dvh items-center justify-center px-6 py-12">
-      <div className="border-line bg-surface w-full max-w-lg rounded-xl border p-8 text-center">
-        <GlasBoog width={46} className="text-brand mx-auto" />
+    <>
+      <PubliekKop
+        oortitel="Word deel van ons"
+        titel="Ons wil jou graag leer ken"
+        leiding="Vul die vorm in en iemand van die kerkkantoor tree met jou in verbinding. Jy hoef nie te wag vir 'n antwoord om by 'n diens in te loer nie."
+      />
 
-        <h1 className="font-display mt-5 text-4xl leading-tight font-semibold text-balance">
-          Welkom by ons gemeente
-        </h1>
-        <p className="text-ink-muted mx-auto mt-2.5 max-w-sm text-base text-balance">
-          Vul asseblief hierdie vorm in en die kerkkantoor sal met jou in
-          verbinding tree.
-        </p>
-
-        <div className="border-line bg-ground text-ink-muted mt-7 rounded-lg border border-dashed p-4 text-left text-sm">
-          Die registrasievorm is nog nie gebou nie. Die velde moet eers by die
-          bestaande Base44-vorm gaan kyk word — sien{" "}
-          <code className="text-ink">docs/base44-reference/notes.md</code>.
+      <section className="veilig-kant mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-8">
+        <div className="onthul glas-paneel border-line rounded-[1.5rem] border p-6 sm:p-9">
+          <p className="text-ink-muted mb-7 text-sm">
+            Velde gemerk met{" "}
+            <span className="text-glas-wyn font-semibold">*</span> is
+            verpligtend.
+          </p>
+          <RegistreerVorm />
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

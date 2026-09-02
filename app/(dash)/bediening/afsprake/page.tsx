@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { afsprake } from "@/lib/mock/bediening";
+import { huidigeGebruiker, magBediening } from "@/lib/sessie";
 import { AfspraakAansig } from "./afspraak-aansig";
 
 export const metadata: Metadata = { title: "Afsprake" };
 
-export default function AfsprakeBladsy() {
+export default async function AfsprakeBladsy() {
+  // Sien die kommentaar in ../page.tsx — die hek moet per bladsy staan.
+  if (!magBediening(await huidigeGebruiker())) notFound();
+
   const lys = afsprake();
 
   return (

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { NAV } from "@/lib/nav";
+import { navVanHrefs } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { GlasBoog } from "@/components/kerk/glas-boog";
 
@@ -17,9 +17,12 @@ import { GlasBoog } from "@/components/kerk/glas-boog";
  * onderhou nie.
  */
 export function SyBalk({
+  navHrefs,
   oop,
   sluit,
 }: {
+  /** Reeds vir die huidige rol gefiltreer — sien app/(dash)/layout.tsx. */
+  navHrefs: string[];
   /** Slegs van toepassing op die laai-gedaante onder `lg`. */
   oop: boolean;
   sluit: () => void;
@@ -85,7 +88,7 @@ export function SyBalk({
         className="bg-lood veilig-links hidden h-full w-64 shrink-0 flex-col overflow-hidden lg:flex"
       >
         <Merk />
-        <Skakels pathname={pathname} />
+        <Skakels navHrefs={navHrefs} pathname={pathname} />
       </nav>
 
       {/* Laai — selfoon en klein tablet. */}
@@ -125,7 +128,7 @@ export function SyBalk({
               <X size={20} strokeWidth={2} aria-hidden />
             </button>
           </div>
-          <Skakels pathname={pathname} />
+          <Skakels navHrefs={navHrefs} pathname={pathname} />
         </div>
       </div>
     </>
@@ -151,10 +154,11 @@ function Merk() {
   );
 }
 
-function Skakels({ pathname }: { pathname: string }) {
+function Skakels({ navHrefs, pathname }: { navHrefs: string[]; pathname: string }) {
+  const nav = useMemo(() => navVanHrefs(navHrefs), [navHrefs]);
   return (
     <ul className="veilig-onder flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
-      {NAV.map(({ etiket, href, ikoon: Ikoon }) => {
+      {nav.map(({ etiket, href, ikoon: Ikoon }) => {
         const aktief = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <li key={href}>

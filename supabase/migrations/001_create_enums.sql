@@ -18,3 +18,6 @@ create type lidmaat_tipe as enum ('belydend', 'doop');
 create type gebeurtenis_kategorie as enum ('algemeen', 'jeug', 'seniors', 'spesiaal');
 
 create type registrasie_status as enum ('wagtend', 'goedgekeur', 'afgekeur');
+
+-- Huwelikstatus op die publieke registrasievorm.
+create type huwelikstatus as enum ('ongetroud', 'getroud', 'weduwee_wewenaar');

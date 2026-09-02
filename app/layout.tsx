@@ -24,6 +24,17 @@ export const metadata: Metadata = {
     "Lidmaatbestuur vir die kerkraad van NG Vanderbijlpark Moedergemeente.",
   applicationName: "Lidmaatbestuur",
   manifest: "/manifest.webmanifest",
+  // iOS gebruik nie die manifes se ikone vir "Voeg by tuisskerm" nie — dit wil
+  // 'n apple-touch-icon hê. Die bediening-tak oorheers dit in sy eie uitleg.
+  icons: {
+    icon: [{ url: "/ikone/app-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/ikone/app-180.png", sizes: "180x180" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Lidmaatbestuur",
+    statusBarStyle: "default",
+  },
   // Interne app met persoonlike data — hou dit uit soekenjins uit.
   robots: { index: false, follow: false },
 };

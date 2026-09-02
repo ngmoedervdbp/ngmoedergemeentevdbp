@@ -10,9 +10,23 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 /** Die enigste roetes wat sonder 'n sessie bereik kan word. */
-const PUBLIEKE_ROETES = ["/registreer", "/teken-in", "/wagwoord-herstel"];
+const PUBLIEKE_ROETES = [
+  // Die openbare webwerf — die gemeenskap se voordeur.
+  "/oor-ons",
+  "/eredienste",
+  "/kalender-gemeente",
+  "/bedienings",
+  "/kontak",
+  // Skryf-alleen registrasie, plus die kerkraad se aanteken-vloei.
+  "/registreer",
+  "/teken-in",
+  "/wagwoord-herstel",
+];
 
 function isPubliek(pathname: string) {
+  // Die tuisblad is die werf se tuisblad, nie 'n admin-bladsy nie.
+  if (pathname === "/") return true;
+
   return PUBLIEKE_ROETES.some(
     (roete) => pathname === roete || pathname.startsWith(`${roete}/`),
   );
@@ -32,8 +46,9 @@ export async function proxy(request: NextRequest) {
     // 'n ontbrekende sleutel is op hierdie stadium die normale toestand, nie 'n
     // stukkende ontplooiing nie, en die throw het die hele demo 500 laat gee.
     //
-    // 'n DEMO_MODUS-vlag is probeer, maar die veranderlike bereik nie die
-    // funksie op Vercel nie, so die app is eerder onvoorwaardelik deurgelaat.
+    // 'n DEMO_MODUS-vlag is probeer en weer verwyder — die veranderlike het
+    // nie die funksie op Vercel bereik nie. Daar is dus GEEN demo-vlag meer
+    // nie: die enigste skakelaar is of die Supabase-sleutels gestel is.
     //
     // MOET HERSTEL WORD sodra Supabase gekoppel is. Op daardie punt is 'n
     // ontbrekende sleutel wel 'n foutiewe ontplooiing en moet dit hard faal —

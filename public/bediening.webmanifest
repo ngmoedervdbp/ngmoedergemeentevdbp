@@ -1,0 +1,33 @@
+{
+  "name": "Bediening Opsporing · NG Moedergemeente",
+  "short_name": "Bediening",
+  "description": "Besoeke, afsprake en preekbeurte vir die dominee.",
+  "lang": "af",
+  "dir": "ltr",
+  "start_url": "/bediening",
+  "scope": "/bediening",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f2ed",
+  "theme_color": "#3b3a72",
+  "icons": [
+    {
+      "src": "/ikone/bediening-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ikone/bediening-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ikone/bediening-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

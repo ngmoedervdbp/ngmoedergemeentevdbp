@@ -18,9 +18,18 @@ create table pending_registrations (
   id uuid primary key default gen_random_uuid(),
   first_name text not null check (length(trim(first_name)) between 1 and 100),
   last_name text not null check (length(trim(last_name)) between 1 and 100),
-  selfoon text check (length(selfoon) <= 30),
+  -- Persoonlike inligting
+  date_of_birth date,
+  geslag geslag,
+  huwelikstatus huwelikstatus,
+
+  -- Kontakinligting. Selfoon is die enigste verpligte kontakveld op die vorm.
+  selfoon text not null check (length(trim(selfoon)) between 6 and 30),
   epos text check (length(epos) <= 255),
   adres text check (length(adres) <= 500),
+
+  -- Wat die persoon self bygevoeg het.
+  aantekeninge text check (length(aantekeninge) <= 2000),
   status registrasie_status not null default 'wagtend',
   goedgekeur_lid_id uuid references lede (id) on delete set null,
   goedgekeur_deur uuid references auth.users (id) on delete set null,
@@ -30,6 +39,10 @@ create table pending_registrations (
 );
 
 create index pending_registrations_status_idx on pending_registrations (status);
+
+-- Die kerkraad lees dit nuutste-eerste; die indeks dra daardie sortering.
+create index pending_registrations_ontvang_idx
+  on pending_registrations (ontvang desc);
 
 comment on table pending_registrations is
   'Moderasietou vir die publieke registrasievorm. Publiek mag slegs INSERT — nooit SELECT nie.';

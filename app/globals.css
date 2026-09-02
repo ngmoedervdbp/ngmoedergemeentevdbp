@@ -61,6 +61,21 @@
   --color-was-roos: #f2dee6;
   --color-was-olyf: #e6e7d3;
 
+  /* ------------------------------------------------------------------
+   * Publieke werf — dieper grond en ryker glas.
+   *
+   * Die admin-app se kalksteen is doelbewus vlak: 'n mens staar heeldag
+   * daarna. 'n Werf wat 'n besoeker 40 sekondes sien, mag — en moet — meer
+   * kleur dra. Dieselfde taal, hoër volume.
+   * ------------------------------------------------------------------ */
+
+  /* Warm perkament in plaas van kaal wit, met 'n dieper trap daaronder. */
+  --color-werf: #f0ece3;
+  --color-werf-diep: #e6e0d3;
+  /* Die nagpaneel: dieper as `lood`, met 'n blou-pers gloed. */
+  --color-nag: #191627;
+  --color-nag-op: #221e35;
+
   --font-display: var(--font-spectral), ui-serif, Georgia, serif;
   --font-sans: var(--font-source-sans), system-ui, -apple-system, sans-serif;
 }
@@ -102,9 +117,22 @@ html {
 .veilig-bo {
   padding-top: env(safe-area-inset-top);
 }
+/*
+ * Keep-veilige kantruimte.
+ *
+ * ⚠ DIT MOET BY 'n BESTAANDE KANTLYN TEL, NIE DIT VERVANG NIE.
+ *
+ * 'n Gewone `padding-left` hier het elke `px-4` op dieselfde element oorskryf
+ * — hierdie lêer laai ná Tailwind se utilities, so dit wen. Die gevolg was
+ * `padding: 0` op elke houer op die werf en inhoud wat die skermrand raak.
+ *
+ * `margin` los dit: dit stapel bo-op die element se eie opvulling in plaas van
+ * daarmee te competeer. Op 'n toestel sonder keep is env() = 0 en verander
+ * niks; op 'n foon met 'n keep skuif dit die inhoud uit die afgeronde hoeke.
+ */
 .veilig-kant {
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  margin-left: env(safe-area-inset-left);
+  margin-right: env(safe-area-inset-right);
 }
 
 /*
@@ -285,4 +313,359 @@ body {
   .kruis-trek .arm-r {
     stroke-dashoffset: 0;
   }
+}
+
+/* ============================================================
+   BEWEGING — die publieke werf
+   ============================================================
+
+   Een idee dra alles: lig wat deur glas val. Dinge verskyn soos die son
+   wat oor 'n venster trek — hulle gly op en helder op, nooit bons of
+   swaai nie. 'n Kerk se webwerf wat rondspring lyk goedkoop; een wat
+   stadig helder word, lyk duur.
+
+   Reël: elke beweging is < 900ms, gebruik 'n sagte curve, en het 'n
+   `prefers-reduced-motion`-uitweg heel onder.
+*/
+
+/* Die enkele easing wat alles deel. Effens oorskiet aan die einde, sonder
+   om te bons — dit is wat "duur" laat voel teenoor 'n reguit lineêre gly. */
+@property --glas-op {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+:root {
+  --lig: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --lig-sag: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* ---- Intree: gly op terwyl dit helder word -------------------------- */
+@keyframes lig-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Vir die held: bietjie verder, bietjie stadiger. */
+@keyframes lig-in-groot {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Die venster wat oopgaan — 'n boog wat van onder af oopvou. */
+@keyframes boog-oop {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Lig wat stadig oor die glas trek. Baie subtiel — jy moet dit eerder
+   voel as sien. */
+@keyframes glas-glans {
+  0%,
+  100% {
+    opacity: 0.13;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.2;
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+.lig-in {
+  animation: lig-in 0.72s var(--lig) both;
+}
+
+.lig-in-groot {
+  animation: lig-in-groot 0.9s var(--lig) both;
+}
+
+.boog-oop {
+  animation: boog-oop 1.1s var(--lig-sag) both;
+}
+
+.glas-glans {
+  animation: glas-glans 14s ease-in-out infinite;
+}
+
+/* Trapsgewyse vertraging. Elke kind kom 'n oomblik ná die vorige — dit is
+   die goedkoopste manier om 'n bladsy duur te laat voel. */
+.trap > * {
+  animation: lig-in 0.72s var(--lig) both;
+}
+.trap > *:nth-child(1) { animation-delay: 0.04s; }
+.trap > *:nth-child(2) { animation-delay: 0.12s; }
+.trap > *:nth-child(3) { animation-delay: 0.2s; }
+.trap > *:nth-child(4) { animation-delay: 0.28s; }
+.trap > *:nth-child(5) { animation-delay: 0.36s; }
+.trap > *:nth-child(6) { animation-delay: 0.44s; }
+
+.vertraag-1 { animation-delay: 0.08s; }
+.vertraag-2 { animation-delay: 0.18s; }
+.vertraag-3 { animation-delay: 0.3s; }
+.vertraag-4 { animation-delay: 0.42s; }
+.vertraag-5 { animation-delay: 0.54s; }
+
+/* ---- Onthul-op-rol -------------------------------------------------- */
+/* `animation-timeline: view()` is die moderne manier: geen waarnemer, geen
+   JavaScript, geen kliëntkomponent. Waar dit nie ondersteun word nie, wys
+   die element eenvoudig — die @supports keer dat dit onsigbaar vasval. */
+@supports (animation-timeline: view()) {
+  .onthul {
+    animation: lig-in 1s var(--lig) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 32%;
+  }
+}
+
+/* ---- Onderstreep wat uitgroei --------------------------------------- */
+.streep-groei {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1.5px;
+  transition: background-size 0.42s var(--lig);
+}
+.streep-groei:hover,
+.streep-groei:focus-visible {
+  background-size: 100% 1.5px;
+}
+
+/* ---- Kaart wat lig vang --------------------------------------------- */
+.glas-kaart {
+  transition:
+    transform 0.42s var(--lig),
+    box-shadow 0.42s var(--lig),
+    border-color 0.42s var(--lig);
+}
+@media (hover: hover) {
+  .glas-kaart:hover {
+    transform: translate3d(0, -3px, 0);
+    box-shadow: 0 18px 40px -24px rgba(34, 31, 38, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lig-in,
+  .lig-in-groot,
+  .boog-oop,
+  .glas-glans,
+  .trap > *,
+  .onthul {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  .glas-kaart:hover {
+    transform: none;
+  }
+  .streep-groei {
+    transition: none;
+  }
+}
+
+
+/* ============================================================
+   PUBLIEKE WERF — kleur met diepte
+   ============================================================ */
+
+/* Die grond self kry 'n baie sagte warm gloed van bo af, sodat 'n lang
+   bladsy nie een plat vel is nie. */
+.werf-grond {
+  background:
+    radial-gradient(
+      120% 60% at 50% 0%,
+      color-mix(in oklab, var(--color-was-amber) 55%, transparent) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      90% 50% at 88% 18%,
+      color-mix(in oklab, var(--color-was-roos) 40%, transparent) 0%,
+      transparent 70%
+    ),
+    var(--color-werf);
+}
+
+/* 'n Afdeling wat 'n toon dieper sit — die ritme wat 'n bladsy uit een plat
+   vel haal. */
+.werf-diep {
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklab, var(--color-werf-diep) 70%, transparent) 12%,
+      color-mix(in oklab, var(--color-werf-diep) 70%, transparent) 88%,
+      transparent 100%
+    );
+}
+
+/* Die nagpaneel — glas van binne verlig. */
+.nag-paneel {
+  background:
+    radial-gradient(
+      100% 80% at 50% 0%,
+      color-mix(in oklab, var(--color-glas-saffier) 55%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      70% 60% at 82% 90%,
+      color-mix(in oklab, var(--color-glas-wyn) 34%, transparent) 0%,
+      transparent 72%
+    ),
+    var(--color-nag);
+}
+
+/* Glas met werklike diepte: 'n binneglans plus 'n sagte kleurskaduwee, in
+   plaas van 'n plat rand. Dít is die verskil tussen "kaart" en "paneel". */
+.glas-paneel {
+  background: linear-gradient(
+    165deg,
+    color-mix(in oklab, white 92%, var(--color-werf)) 0%,
+    white 46%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(34, 31, 38, 0.04),
+    0 12px 28px -20px rgba(34, 31, 38, 0.26);
+}
+
+/* ---- Sweefborrels: die ikoonbolle wat saggies dryf ------------------ */
+@keyframes dryf {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0) rotate(-1.5deg);
+  }
+}
+
+.dryf {
+  animation: dryf 6s ease-in-out infinite;
+}
+
+/* Elke borrel begin op 'n ander plek in sy siklus — anders wieg hulle almal
+   soos een blok, wat onmiddellik meganies lyk. */
+.dryf-1 { animation-delay: -0.6s; animation-duration: 6.4s; }
+.dryf-2 { animation-delay: -2.1s; animation-duration: 7.2s; }
+.dryf-3 { animation-delay: -3.4s; animation-duration: 5.8s; }
+.dryf-4 { animation-delay: -1.3s; animation-duration: 6.9s; }
+.dryf-5 { animation-delay: -4.2s; animation-duration: 7.6s; }
+.dryf-6 { animation-delay: -2.8s; animation-duration: 6.1s; }
+
+/* 'n Borrel wat 'n bietjie terugdruk wanneer jy dit vat. */
+.borrel {
+  transition:
+    transform 0.5s var(--lig),
+    box-shadow 0.5s var(--lig);
+}
+@media (hover: hover) {
+  .borrel:hover {
+    transform: translate3d(0, -5px, 0) scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dryf {
+    animation: none !important;
+  }
+  .borrel:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Ryp glas — die navigasiebalk
+   ============================================================
+
+   'n Egte frosted-effek is drie lae, nie een nie:
+     1. 'n halfdeursigtige grond met versadiging (saturate) — sonder dit
+        lyk vervaagde kleur dood en grys;
+     2. 'n binneglans bo-aan waar die "rand" van die glas lig vang;
+     3. 'n haarlyn onder wat eers verskyn sodra jy rol, sodat die balk op
+        die tuisblad se held saamsmelt eerder as om dit af te sny.
+
+   `saturate(180%)` is die deel wat die meeste saak maak: dit is wat 'n
+   vervaagde agtergrond lewendig hou in plaas van vuilgrys.
+*/
+.ryp-glas {
+  background-color: color-mix(in oklab, var(--color-werf) 72%, transparent);
+  /* Let wel: die vervaging self kom van Tailwind se `backdrop-blur-xl` en
+     `backdrop-saturate-150` op die element. Dit hier as 'n rou eienskap skryf
+     werk NIE — Lightning CSS stroop dit uit hierdie konteks. Hou dus die
+     kleur/skadu hier en die filter in die klaslys. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition:
+    background-color 0.4s var(--lig),
+    box-shadow 0.4s var(--lig),
+    border-color 0.4s var(--lig);
+}
+
+/* Sodra die bladsy rol, word die balk digter en kry 'n rand. */
+.ryp-glas[data-gerol="ja"] {
+  background-color: color-mix(in oklab, var(--color-werf) 88%, transparent);
+  border-color: var(--color-line);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 20px -8px rgba(34, 31, 38, 0.22);
+}
+
+/* Waar backdrop-filter nie ondersteun word nie, val terug op 'n soliede
+   grond — 'n halfdeursigtige balk sonder vervaging is onleesbaar. */
+@supports not (backdrop-filter: blur(1px)) {
+  .ryp-glas,
+  .ryp-glas[data-gerol="ja"] {
+    background-color: var(--color-werf);
+  }
+}
+
+/* ---- Aktiewe nav-item: 'n gloeiende pil ---------------------------- */
+.nav-pil {
+  position: relative;
+}
+.nav-pil::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-brand) 16%, transparent),
+    color-mix(in oklab, var(--color-brand) 9%, transparent)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 2px 10px -4px color-mix(in oklab, var(--color-brand) 45%, transparent);
+}
+
+/* ---- Afdelingskeier: 'n hairline wat na niks verdwyn --------------- */
+.skei-lyn {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-line) 22%,
+    var(--color-line) 78%,
+    transparent
+  );
 }

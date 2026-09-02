@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Menu, Search } from "lucide-react";
-import { NAV } from "@/lib/nav";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { navVanHrefs } from "@/lib/nav";
+import { tekenUit } from "@/app/(dash)/uitteken-aksie";
 import { fmtDatum } from "@/lib/format";
 import { LEDE, volleNaam, voorletters } from "@/lib/mock";
 import { cn } from "@/lib/utils";
@@ -15,12 +16,22 @@ import { cn } from "@/lib/utils";
  * navigasie-helfte, sodat daardie bladsy net die gevorderde filters hoef te dra.
  */
 export function BoBalk({
+  navHrefs,
   gebruiker,
+  rolEtiket,
   openNav,
 }: {
+  /**
+   * Reeds vir die rol gefiltreer. Die palet MOET dieselfde lys gebruik as die
+   * sybalk — met die volle NAV sou 'n soektog na "bediening" die skakel wys
+   * aan iemand wat dit nie mag sien nie.
+   */
+  navHrefs: string[];
   gebruiker: string;
+  rolEtiket: string;
   openNav: () => void;
 }) {
+  const nav = useMemo(() => navVanHrefs(navHrefs), [navHrefs]);
   const [oop, setOop] = useState(false);
   const [vraag, setVraag] = useState("");
   const invoer = useRef<HTMLInputElement>(null);
@@ -47,7 +58,7 @@ export function BoBalk({
 
   const skoon = vraag.trim().toLowerCase();
   const bladsye = skoon
-    ? NAV.filter((n) => n.etiket.toLowerCase().includes(skoon)).slice(0, 4)
+    ? nav.filter((n) => n.etiket.toLowerCase().includes(skoon)).slice(0, 4)
     : [];
   const lede = skoon
     ? LEDE.filter((l) => volleNaam(l).toLowerCase().includes(skoon)).slice(0, 6)
@@ -108,8 +119,19 @@ export function BoBalk({
               <span className="block text-sm leading-tight font-semibold">
                 {gebruiker}
               </span>
-              <span className="text-ink-muted block text-xs">Skriba</span>
+              <span className="text-ink-muted block text-xs">{rolEtiket}</span>
             </span>
+            <form action={tekenUit}>
+              <button
+                type="submit"
+                title="Teken uit"
+                aria-label="Teken uit"
+                className="text-ink-muted hover:bg-stage hover:text-ink focus-visible:outline-accent flex size-11 min-w-[44px] items-center justify-center rounded-lg transition-colors focus-visible:outline-2"
+              >
+                <LogOut size={17} strokeWidth={1.9} aria-hidden />
+              </button>
+            </form>
+
             <span
               aria-hidden
               className="boog-vorm bg-was-saffier text-glas-saffier ring-line flex size-9 items-center justify-center text-xs font-semibold ring-1"

@@ -78,12 +78,23 @@ export type Dokument = {
   opgelaai: string | null;
 };
 
+export type Huwelikstatus = "ongetroud" | "getroud" | "weduwee_wewenaar";
+
+export type RegistrasieStatus = "wagtend" | "goedgekeur" | "afgekeur";
+
+/** Spieël `pending_registrations` in migrasie 009. */
 export type Registrasie = {
   id: string;
   first_name: string;
   last_name: string;
-  selfoon: string | null;
+  date_of_birth: string | null;
+  geslag: Geslag | null;
+  huwelikstatus: Huwelikstatus | null;
+  /** Die enigste verpligte kontakveld op die vorm. */
+  selfoon: string;
   epos: string | null;
   adres: string | null;
+  aantekeninge: string | null;
+  status: RegistrasieStatus;
   ontvang: string;
 };

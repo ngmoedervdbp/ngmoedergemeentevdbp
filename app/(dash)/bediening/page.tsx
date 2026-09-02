@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CalendarDays, Clock, MapPin, TrendingUp } from "lucide-react";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { StatTeel } from "@/components/kerk/stat-teel";
@@ -10,6 +11,7 @@ import {
   tellingPerTipe,
 } from "@/lib/mock/bediening";
 import { BedieningAansig } from "./bediening-aansig";
+import { huidigeGebruiker, magBediening } from "@/lib/sessie";
 
 export const metadata: Metadata = { title: "Bediening" };
 
@@ -22,7 +24,12 @@ export const metadata: Metadata = { title: "Bediening" };
  * Die data en die syfers word hier op die bediener bereken; die oortjies self
  * is 'n kliëntkomponent omdat dit interaktief is.
  */
-export default function BedieningBladsy() {
+export default async function BedieningBladsy() {
+  // Die hek moet HIER staan, nie net in die uitleg nie: Next render 'n uitleg
+  // en sy bladsy PARALLEL, so die uitleg se notFound() keer nie dat hierdie
+  // bladsy sy data haal en in die RSC-vrag stuur nie.
+  if (!magBediening(await huidigeGebruiker())) notFound();
+
   const lys = aktiwiteite();
   const week = aktiwiteiteHierdieWeek();
   const oorsig = bedieningOorsig(lys);

@@ -2,6 +2,7 @@ import { Skil } from "@/components/kerk/skil";
 import { MeldingVerskaffer } from "@/components/ui/melding";
 import { navHrefsVir } from "@/lib/nav";
 import { huidigeGebruiker, ROL_ETIKET } from "@/lib/sessie";
+import { haalLede } from "@/lib/data/gemeente-data";
 
 /**
  * Die skil staan stil; net die inhoud rol.
@@ -16,13 +17,17 @@ import { huidigeGebruiker, ROL_ETIKET } from "@/lib/sessie";
  * in die HTML nie — eerder as om dit met CSS weg te steek.
  */
 export default async function DashLayout({ children }: LayoutProps<"/">) {
-  const gebruiker = await huidigeGebruiker();
+  const [gebruiker, lede] = await Promise.all([
+    huidigeGebruiker(),
+    haalLede(),
+  ]);
   const navHrefs = navHrefsVir(gebruiker?.rol ?? null);
 
   return (
     <MeldingVerskaffer>
       <Skil
         navHrefs={navHrefs}
+        lede={lede}
         gebruiker={gebruiker?.naam ?? "Gas"}
         rolEtiket={gebruiker ? ROL_ETIKET[gebruiker.rol] : ""}
       >

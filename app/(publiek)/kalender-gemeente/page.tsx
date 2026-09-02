@@ -21,10 +21,10 @@ const TOON: Record<string, { kleur: string; was: string; etiket: string }> = {
   spesiaal: { kleur: GLAS.wyn, was: "bg-was-wyn", etiket: "Spesiaal" },
 };
 
-export default function KalenderBladsy() {
+export default async function KalenderBladsy() {
   // Gesinkroniseer uit die stelsel se gebeurtenisse — sien
   // lib/publieke-kalender.ts vir wat publiek word en wat nie.
-  const komende = komendePubliek(24);
+  const komende = await komendePubliek(24);
 
   // Groepeer per maand, want 'n plat lys van 24 items lees soos 'n spreadsheet.
   const perMaand = new Map<string, typeof komende>();

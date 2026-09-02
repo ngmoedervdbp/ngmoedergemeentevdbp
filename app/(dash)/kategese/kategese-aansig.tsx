@@ -11,11 +11,13 @@ import { Kenteken, Knop, Leeg, Paneel, PaneelKop } from "@/components/ui/basis";
 import { Oortjies, OortjiePaneel } from "@/components/ui/oortjies";
 import { Modaal } from "@/components/ui/modaal";
 import { Invoer, Kies, Veld, VeldRy } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { stoorKategeseGroep } from "@/lib/data/aksies";
 import { GebeurtenisModaal } from "@/components/modale/algemene-modale";
 import { Tabelrol } from "@/components/ui/tabel";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
-import { volleNaam, type Gebeurtenis, type KategeseGroep, type Lid } from "@/lib/mock";
+import { type Gebeurtenis, type KategeseGroep, type Lid } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 
 type Blad = "groepe" | "kinders" | "kalender";
 
@@ -203,7 +205,7 @@ export function KategeseAansig({
           <>
             <Knop soort="stil" onClick={() => setDeelIn(null)}>Kanselleer</Knop>
             <Knop soort="primer" onClick={() => {
-              wys(DEMO(`${deelIn ? volleNaam(deelIn) : "Kind"} ingedeel`));
+              wys("Kies 'n groep om die kind in te deel — nog nie gebou nie.", "info");
               setDeelIn(null);
             }}>Deel in</Knop>
           </>
@@ -226,11 +228,15 @@ function GroepModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
   const [naam, setNaam] = useState("");
   const [fout, setFout] = useState<string>();
 
-  function stoor(e: React.FormEvent) {
+  async function stoor(e: React.FormEvent) {
     e.preventDefault();
     if (!naam.trim()) { setFout("Groepnaam is verpligtend."); return; }
     setFout(undefined);
-    wys(DEMO(`Groep “${naam}” geskep`));
+    const fd = new FormData();
+    fd.set("naam", naam);
+    const u = await stoorKategeseGroep(fd);
+    if (!u.ok) { wys(u.fout, "fout"); return; }
+    wys(`Groep “${naam}” geskep.`);
     setNaam("");
     sluit();
   }
@@ -281,7 +287,7 @@ function KindModaal({ oop, sluit, groepe }: {
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop soort="primer" onClick={() => { wys(DEMO("Kind bygevoeg")); sluit(); }}>Voeg by</Knop>
+          <Knop soort="primer" onClick={() => { wys("Byvoeging is nog nie gebou nie.", "info"); sluit(); }}>Voeg by</Knop>
         </>
       }>
       <div className="flex flex-col gap-4">

@@ -1,12 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { REGISTRASIES } from "@/lib/mock";
-import type { Registrasie } from "@/lib/mock";
+import type { Registrasie } from "@/lib/tipes/gemeente";
 
 /**
  * Registrasies vir die kerkraad se moderasietou.
  *
- * Dit is die EERSTE navraag in die app wat regtig na Supabase gaan. Die res
- * lees nog uit `lib/mock/`.
+ * Die publiek mag in hierdie tabel INSERT en niks anders nie (migrasie 011);
+ * hierdie is die enigste plek waar dit gelees word.
  *
  * Terwyl daar geen Supabase-sleutels is nie, val dit terug op die spotdata
  * sodat die bladsy op 'n demo-ontplooiing steeds iets wys. Sodra die sleutels
@@ -27,13 +26,11 @@ export async function haalRegistrasies(): Promise<{
   registrasies: Registrasie[];
   bron: RegistrasieBron;
 }> {
+  // Geen terugval na spotdata meer nie: elke ander bladsy lees nou uit
+  // Supabase, en 'n enkele bladsy met versinde rye is meer verwarrend as 'n
+  // leë lys.
   if (!heltSupabase()) {
-    return {
-      registrasies: [...REGISTRASIES].sort((a, b) =>
-        b.ontvang.localeCompare(a.ontvang),
-      ),
-      bron: "spotdata",
-    };
+    return { registrasies: [], bron: "spotdata" };
   }
 
   const supabase = await createClient();

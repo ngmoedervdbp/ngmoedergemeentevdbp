@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Afspraak, BedieningAktiwiteit } from "@/lib/mock/bediening-tipes";
+import type { Afspraak, BedieningAktiwiteit } from "@/lib/tipes/bediening";
 
 /**
  * Die Dominee se bedieningsdata uit Supabase.

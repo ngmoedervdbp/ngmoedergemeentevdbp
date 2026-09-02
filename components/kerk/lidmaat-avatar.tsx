@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import { voorletters, type Lid } from "@/lib/mock";
+import { type Lid } from "@/lib/tipes/gemeente";
+import { voorletters } from "@/lib/data/afleidings";
 
 /**
  * Elke lidmaat 'n paneel in die venster.

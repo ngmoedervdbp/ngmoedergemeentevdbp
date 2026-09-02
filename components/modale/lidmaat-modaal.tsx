@@ -6,7 +6,7 @@ import { Knop } from "@/components/ui/basis";
 import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
 import { useMelding } from "@/components/ui/melding";
 import { stoorLidmaat } from "@/lib/data/aksies";
-import type { Family, Lid, Wyk } from "@/lib/mock/tipes";
+import type { Family, Lid, Wyk } from "@/lib/tipes/gemeente";
 
 /**
  * Een vorm vir "Nuwe lidmaat" en "Wysig lidmaat".

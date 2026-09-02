@@ -3,6 +3,7 @@
 import { useCallback, useState, type ReactNode } from "react";
 import { SyBalk } from "@/components/kerk/sy-balk";
 import { BoBalk } from "@/components/kerk/bo-balk";
+import type { Lid } from "@/lib/tipes/gemeente";
 
 
 /**
@@ -15,11 +16,13 @@ import { BoBalk } from "@/components/kerk/bo-balk";
  */
 export function Skil({
   navHrefs,
+  lede,
   gebruiker,
   rolEtiket,
   children,
 }: {
   navHrefs: string[];
+  lede: Lid[];
   gebruiker: string;
   rolEtiket: string;
   children: ReactNode;
@@ -33,6 +36,7 @@ export function Skil({
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <BoBalk
           navHrefs={navHrefs}
+          lede={lede}
           gebruiker={gebruiker}
           rolEtiket={rolEtiket}
           openNav={() => setNavOop(true)}

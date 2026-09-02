@@ -9,7 +9,8 @@ import { StatTeel } from "@/components/kerk/stat-teel";
 import { Kenteken, Knop, Leeg, Paneel } from "@/components/ui/basis";
 import { Tabelrol } from "@/components/ui/tabel";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
-import { volleNaam, type Lid, type Status, type Wyk } from "@/lib/mock";
+import { type Lid, type Status, type Wyk } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 
 const MAANDE = ["Januarie","Februarie","Maart","April","Mei","Junie","Julie","Augustus","September","Oktober","November","Desember"];
 

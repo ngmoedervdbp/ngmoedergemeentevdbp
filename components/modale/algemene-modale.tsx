@@ -5,8 +5,13 @@ import { Download, FileSpreadsheet, QrCode, Upload } from "lucide-react";
 import { Modaal } from "@/components/ui/modaal";
 import { Kenteken, Knop } from "@/components/ui/basis";
 import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
-import { WYKE, type Family, type Wyk } from "@/lib/mock";
+import { useMelding } from "@/components/ui/melding";
+import {
+  stoorGebeurtenis,
+  stoorGesin,
+  stoorWyk,
+} from "@/lib/data/aksies";
+import type { Family, Wyk } from "@/lib/tipes/gemeente";
 
 /* ---------------------------------------------------------------
    Bevestig — een dialoog vir elke ja/nee-aksie
@@ -47,12 +52,23 @@ export function WykModaal({ oop, sluit, wyk }: { oop: boolean; sluit: () => void
   const [nommer, setNommer] = useState(wyk?.nommer ?? "");
   const [fout, setFout] = useState<string>();
 
-  function stoor(e: React.FormEvent) {
+  const [besig, setBesig] = useState(false);
+
+  async function stoor(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!nommer.trim()) { setFout("Wyknommer is verpligtend."); return; }
     setFout(undefined);
-    wys(DEMO(`Wyk ${nommer} ${wyk ? "opgedateer" : "geskep"}`));
-    sluit();
+
+    setBesig(true);
+    const uitslag = await stoorWyk(new FormData(e.currentTarget));
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(`Wyk ${nommer} ${wyk ? "opgedateer" : "geskep"}.`);
+      sluit();
+    } else {
+      wys(uitslag.fout, "fout");
+    }
   }
 
   return (
@@ -60,25 +76,31 @@ export function WykModaal({ oop, sluit, wyk }: { oop: boolean; sluit: () => void
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop type="submit" form="wyk-vorm" soort="primer">{wyk ? "Stoor" : "Skep wyk"}</Knop>
+          <Knop type="submit" form="wyk-vorm" soort="primer" disabled={besig}>
+            {besig ? "Stoor tans…" : wyk ? "Stoor" : "Skep wyk"}
+          </Knop>
         </>
       }>
       <form id="wyk-vorm" onSubmit={stoor} className="flex flex-col gap-4" noValidate>
+        <input type="hidden" name="id" value={wyk?.id ?? ""} />
         <VeldRy>
           <Veld etiket="Wyknommer" verpligtend fout={fout}
             hulp="Teks, nie 'n getal nie — “30 A” is geldig.">
-            <Invoer value={nommer} onChange={(e) => setNommer(e.target.value)} placeholder="30 A" />
+            <Invoer name="nommer" value={nommer} onChange={(e) => setNommer(e.target.value)} placeholder="30 A" />
           </Veld>
           <Veld etiket="Kapasiteit" hulp="Riglyn, nie afgedwing nie.">
-            <Kies defaultValue={String(wyk?.kapasiteit ?? 50)}>
+            <Kies name="kapasiteit" defaultValue={String(wyk?.kapasiteit ?? 50)}>
               <option value="50">50</option>
               <option value="60">60</option>
               <option value="70">70</option>
             </Kies>
           </Veld>
         </VeldRy>
+        <Veld etiket="Wyknaam" verpligtend hulp="Bv. “Wyk 30 A — Noord”.">
+          <Invoer name="naam" defaultValue={wyk?.naam ?? ""} placeholder="Wyknaam" required />
+        </Veld>
         <Veld etiket="Wyksouderling" hulp="Laat leeg as die wyk vakant is.">
-          <Invoer defaultValue={wyk?.ouderling ?? ""} placeholder="Naam en van" />
+          <Invoer name="ouderling" defaultValue={wyk?.ouderling ?? ""} placeholder="Naam en van" />
         </Veld>
       </form>
     </Modaal>
@@ -89,17 +111,28 @@ export function WykModaal({ oop, sluit, wyk }: { oop: boolean; sluit: () => void
    Gesin
    --------------------------------------------------------------- */
 
-export function GesinModaal({ oop, sluit, gesin }: { oop: boolean; sluit: () => void; gesin?: Family }) {
+export function GesinModaal({ oop, sluit, gesin, wyke }: { oop: boolean; sluit: () => void; gesin?: Family; wyke?: Wyk[] }) {
   const { wys } = useMelding();
   const [naam, setNaam] = useState(gesin?.naam ?? "");
   const [fout, setFout] = useState<string>();
 
-  function stoor(e: React.FormEvent) {
+  const [besig, setBesig] = useState(false);
+
+  async function stoor(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!naam.trim()) { setFout("Gesinsnaam is verpligtend."); return; }
     setFout(undefined);
-    wys(DEMO(`Gesin ${naam} ${gesin ? "opgedateer" : "geskep"}`));
-    sluit();
+
+    setBesig(true);
+    const uitslag = await stoorGesin(new FormData(e.currentTarget));
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(`Gesin ${naam} ${gesin ? "opgedateer" : "geskep"}.`);
+      sluit();
+    } else {
+      wys(uitslag.fout, "fout");
+    }
   }
 
   return (
@@ -108,25 +141,28 @@ export function GesinModaal({ oop, sluit, gesin }: { oop: boolean; sluit: () => 
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop type="submit" form="gesin-vorm" soort="primer">{gesin ? "Stoor" : "Skep gesin"}</Knop>
+          <Knop type="submit" form="gesin-vorm" soort="primer" disabled={besig}>
+            {besig ? "Stoor tans…" : gesin ? "Stoor" : "Skep gesin"}
+          </Knop>
         </>
       }>
       <form id="gesin-vorm" onSubmit={stoor} className="flex flex-col gap-4" noValidate>
+        <input type="hidden" name="id" value={gesin?.id ?? ""} />
         <Veld etiket="Gesinsnaam" verpligtend fout={fout}
           hulp="Gewoonlik die van — maar dit hoef nie te wees nie.">
-          <Invoer value={naam} onChange={(e) => setNaam(e.target.value)} placeholder="Ries" />
+          <Invoer name="naam" value={naam} onChange={(e) => setNaam(e.target.value)} placeholder="Ries" />
         </Veld>
         <Veld etiket="Adres">
-          <Invoer defaultValue={gesin?.adres ?? ""} placeholder="8 Toselli Straat" />
+          <Invoer name="adres" defaultValue={gesin?.adres ?? ""} placeholder="8 Toselli Straat" />
         </Veld>
         <VeldRy>
           <Veld etiket="Stad">
-            <Invoer defaultValue={gesin?.stad ?? "Vanderbijlpark"} />
+            <Invoer name="stad" defaultValue={gesin?.stad ?? "Vanderbijlpark"} />
           </Veld>
           <Veld etiket="Wyk">
-            <Kies defaultValue={gesin?.wyk_id ?? ""}>
+            <Kies name="wyk_id" defaultValue={gesin?.wyk_id ?? ""}>
               <option value="">Geen wyk</option>
-              {WYKE.map((w) => <option key={w.id} value={w.id}>{w.naam}</option>)}
+              {(wyke ?? []).map((w: Wyk) => <option key={w.id} value={w.id}>{w.naam}</option>)}
             </Kies>
           </Veld>
         </VeldRy>
@@ -144,12 +180,22 @@ export function GebeurtenisModaal({ oop, sluit }: { oop: boolean; sluit: () => v
   const [titel, setTitel] = useState("");
   const [fout, setFout] = useState<string>();
 
-  function stoor(e: React.FormEvent) {
+  const [besig, setBesig] = useState(false);
+
+  async function stoor(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!titel.trim()) { setFout("Titel is verpligtend."); return; }
     setFout(undefined);
-    wys(DEMO(`“${titel}” op die kalender geplaas`));
-    sluit();
+    setBesig(true);
+    const uitslag = await stoorGebeurtenis(new FormData(e.currentTarget));
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(`“${titel}” op die kalender geplaas.`);
+      sluit();
+    } else {
+      wys(uitslag.fout, "fout");
+    }
   }
 
   return (
@@ -157,27 +203,29 @@ export function GebeurtenisModaal({ oop, sluit }: { oop: boolean; sluit: () => v
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop type="submit" form="geb-vorm" soort="primer">Skep gebeurtenis</Knop>
+          <Knop type="submit" form="geb-vorm" soort="primer" disabled={besig}>
+            {besig ? "Stoor tans…" : "Skep gebeurtenis"}
+          </Knop>
         </>
       }>
       <form id="geb-vorm" onSubmit={stoor} className="flex flex-col gap-4" noValidate>
         <Veld etiket="Titel" verpligtend fout={fout}>
-          <Invoer value={titel} onChange={(e) => setTitel(e.target.value)} placeholder="Oggenddiens" />
+          <Invoer name="titel" value={titel} onChange={(e) => setTitel(e.target.value)} placeholder="Oggenddiens" />
         </Veld>
         <VeldRy>
           <Veld etiket="Datum" verpligtend>
-            <Invoer type="date" defaultValue={new Date().toISOString().slice(0, 10)} />
+            <Invoer type="date" name="datum" defaultValue={new Date().toISOString().slice(0, 10)} />
           </Veld>
           <Veld etiket="Tyd">
-            <Invoer type="time" defaultValue="09:00" />
+            <Invoer type="time" name="tyd" defaultValue="09:00" />
           </Veld>
         </VeldRy>
         <VeldRy>
           <Veld etiket="Plek">
-            <Invoer placeholder="Kerkgebou" />
+            <Invoer name="plek" placeholder="Kerkgebou" />
           </Veld>
           <Veld etiket="Kategorie">
-            <Kies defaultValue="algemeen">
+            <Kies name="kategorie" defaultValue="algemeen">
               <option value="algemeen">Algemeen</option>
               <option value="jeug">Jeug</option>
               <option value="seniors">Seniors</option>
@@ -208,7 +256,7 @@ export function UitvoerModaal({
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
           <Knop soort="primer" ikoon={Download}
-            onClick={() => { wys(DEMO("Lêer sou afgelaai word")); sluit(); }}>
+            onClick={() => { wys("Uitvoer is nog nie gebou nie.", "info"); sluit(); }}>
             Laai af
           </Knop>
         </>
@@ -240,7 +288,7 @@ export function InvoerModaal({ oop, sluit }: { oop: boolean; sluit: () => void }
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
           <Knop soort="primer" ikoon={Upload}
-            onClick={() => { wys(DEMO("Lêer sou verwerk word")); sluit(); }}>
+            onClick={() => { wys("Invoer is nog nie gebou nie.", "info"); sluit(); }}>
             Laai op
           </Knop>
         </>
@@ -276,7 +324,7 @@ export function OplaaiModaal({
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
           <Knop soort="primer" ikoon={Upload}
-            onClick={() => { wys(DEMO(`${titel} opgelaai`)); sluit(); }}>
+            onClick={() => { wys("Oplaai is nog nie gebou nie.", "info"); sluit(); }}>
             Laai op
           </Knop>
         </>

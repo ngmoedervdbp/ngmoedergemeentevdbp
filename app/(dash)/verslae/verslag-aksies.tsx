@@ -7,8 +7,9 @@ import { Knop } from "@/components/ui/basis";
 import { Modaal } from "@/components/ui/modaal";
 import { UitvoerModaal } from "@/components/modale/algemene-modale";
 import { LidmaatAvatar } from "@/components/kerk/lidmaat-avatar";
-import { DEMO, useMelding } from "@/components/ui/melding";
-import { volleNaam, type Lid } from "@/lib/mock";
+import { useMelding } from "@/components/ui/melding";
+import { type Lid } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 
 export function VerslagAksies({ aantal }: { aantal: number }) {
   const [oop, setOop] = useState<"uitvoer" | null>(null);
@@ -17,7 +18,7 @@ export function VerslagAksies({ aantal }: { aantal: number }) {
     <>
       <Knop ikoon={Download} grootte="sm" onClick={() => setOop("uitvoer")}>Uitvoer</Knop>
       <Knop soort="primer" ikoon={FileText} grootte="sm"
-        onClick={() => wys(DEMO("PDF-verslag sou gegenereer word"), "info")}>
+        onClick={() => wys("PDF-uitvoer is nog nie gebou nie.", "info")}>
         Volledige lidmateverslag
       </Knop>
       <UitvoerModaal oop={oop === "uitvoer"} sluit={() => setOop(null)} aantal={aantal} />

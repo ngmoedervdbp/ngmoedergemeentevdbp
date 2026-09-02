@@ -15,7 +15,7 @@ import { Kenteken, Knop, Leeg, Paneel } from "@/components/ui/basis";
 import { useMelding } from "@/components/ui/melding";
 import { keurGoedEnSkepLidmaat, keurRegistrasie } from "@/lib/data/aksies";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
-import type { Registrasie, RegistrasieStatus } from "@/lib/mock";
+import type { Registrasie, RegistrasieStatus } from "@/lib/tipes/gemeente";
 import { cn } from "@/lib/utils";
 
 const STATUS: Record<

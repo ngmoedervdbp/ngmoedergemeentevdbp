@@ -1,6 +1,6 @@
 import { Archive, CircleCheck, CircleMinus, Repeat } from "lucide-react";
 import { Kenteken } from "@/components/ui/basis";
-import type { Status } from "@/lib/mock";
+import type { Status } from "@/lib/tipes/gemeente";
 
 const KAART = {
   aktief: { etiket: "Aktief", toon: "aktief", ikoon: CircleCheck },

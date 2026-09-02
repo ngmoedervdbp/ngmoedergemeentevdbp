@@ -10,10 +10,12 @@ import { StatusKenteken } from "@/components/kerk/status-kenteken";
 import { Knop, Leeg, Paneel } from "@/components/ui/basis";
 import { Oortjies, OortjiePaneel } from "@/components/ui/oortjies";
 import { BevestigModaal } from "@/components/modale/algemene-modale";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { keurGoedEnSkepLidmaat, keurRegistrasie } from "@/lib/data/aksies";
 import { Tabelrol } from "@/components/ui/tabel";
 import { berekenOuderdom, fmtMaandJaar, fmtOuderdom } from "@/lib/format";
-import { volleNaam, type Lid, type Registrasie, type Status, type Wyk } from "@/lib/mock";
+import { type Lid, type Registrasie, type Status, type Wyk } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 import { cn } from "@/lib/utils";
 
 type Aansig = "kaarte" | "lys";
@@ -234,7 +236,10 @@ function RegistrasieAksies({ registrasie }: { registrasie: Registrasie }) {
         titel="Keur registrasie goed"
         beskrywing={<><strong className="text-ink font-semibold">{naam}</strong> word &apos;n aktiewe lidmaat en verskyn dadelik in verslae en statistieke.</>}
         bevestigEtiket="Keur goed"
-        opBevestig={() => wys(DEMO(`${naam} goedgekeur`))}
+        opBevestig={async () => {
+          const u = await keurGoedEnSkepLidmaat(registrasie.id);
+          wys(u.ok ? `${naam} goedgekeur.` : u.fout, u.ok ? undefined : "fout");
+        }}
       />
 
       <BevestigModaal
@@ -243,7 +248,10 @@ function RegistrasieAksies({ registrasie }: { registrasie: Registrasie }) {
         soort="gevaar"
         beskrywing={<>Die aansoek van <strong className="text-ink font-semibold">{naam}</strong> word verwyder. Hulle sal weer moet registreer.</>}
         bevestigEtiket="Verwerp"
-        opBevestig={() => wys(DEMO(`${naam} verwerp`), "info")}
+        opBevestig={async () => {
+          const u = await keurRegistrasie(registrasie.id, false);
+          wys(u.ok ? `${naam} verwerp.` : u.fout, u.ok ? undefined : "fout");
+        }}
       />
     </>
   );

@@ -4,12 +4,13 @@ import {
   OUDERDOMSGROEPE,
 } from "@/lib/format";
 import type {
+  Family,
   Gebeurtenis,
   KategeseGroep,
   Lid,
   Status,
   Wyk,
-} from "@/lib/mock/tipes";
+} from "@/lib/tipes/gemeente";
 
 /**
  * Afleidings oor die gemeentedata — tellings, ouderdomsgroepe, verjaarsdae.
@@ -41,6 +42,9 @@ export const lidPerId = (lede: Lid[], id: string) =>
 
 export const wykPerId = (wyke: Wyk[], id: string | null) =>
   id ? (wyke.find((w) => w.id === id) ?? null) : null;
+
+export const familyPerId = (families: Family[], id: string | null) =>
+  id ? (families.find((f) => f.id === id) ?? null) : null;
 
 export const ledeInWyk = (lede: Lid[], wyk_id: string) =>
   aktieweLede(lede).filter((l) => l.wyk_id === wyk_id);

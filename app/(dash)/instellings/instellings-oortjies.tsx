@@ -10,22 +10,34 @@ import { Oortjies, OortjiePaneel } from "@/components/ui/oortjies";
 import { Modaal } from "@/components/ui/modaal";
 import { Invoer, Kies, Teksarea, Veld } from "@/components/ui/vorm";
 import { QrModaal } from "@/components/modale/algemene-modale";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
 import { Tabelrol } from "@/components/ui/tabel";
+import type { KerkraadLid } from "@/lib/data/gebruikers";
+import type { Rol } from "@/lib/sessie";
+import { stelGebruikerRol } from "@/lib/data/aksies";
 
 const REGISTRASIE_URL = "https://ngmoeder.co.za/registreer";
 
-const KERKRAAD = [
-  { naam: "Tiaan Botha", epos: "dev2@startechgroup.co.za", rol: "Admin" },
-  { naam: "Ds. Marius van Zyl", epos: "dominee@ngmoeder.co.za", rol: "Admin" },
-  { naam: "Hans Kruger", epos: "hans.kruger@vodamail.co.za", rol: "Ouderling" },
-  { naam: "Piet Els", epos: "piet.els@gmail.com", rol: "Ouderling" },
-  { naam: "Daleen Haasbroek", epos: "daleen.haasbroek@sasol.com", rol: "Ouderling" },
-] as const;
+/** Al vyf rolle — sien `Rol` in lib/sessie.ts en die enum in migrasie 019. */
+const ROLLE: { waarde: Rol; etiket: string }[] = [
+  { waarde: "admin", etiket: "Administrateur" },
+  { waarde: "dominee", etiket: "Dominee" },
+  { waarde: "skriba", etiket: "Skriba" },
+  { waarde: "ouderling", etiket: "Ouderling" },
+  { waarde: "kerkraad", etiket: "Kerkraad" },
+];
 
 type Oortjie = "gemeente" | "registrasie" | "admin";
 
-export function InstellingsOortjies() {
+export function InstellingsOortjies({
+  kerkraad,
+  isAdmin,
+  myId,
+}: {
+  kerkraad: KerkraadLid[];
+  isAdmin: boolean;
+  myId: string;
+}) {
   const [oortjie, setOortjie] = useState<Oortjie>("gemeente");
   const [gekopieer, setGekopieer] = useState(false);
   const [qr, setQr] = useState(false);
@@ -51,7 +63,7 @@ export function InstellingsOortjies() {
         items={[
           { sleutel: "gemeente", etiket: "Gemeente", ikoon: Building2 },
           { sleutel: "registrasie", etiket: "Registrasie", ikoon: Link2 },
-          { sleutel: "admin", etiket: "Admin", ikoon: Shield, telling: KERKRAAD.length },
+          { sleutel: "admin", etiket: "Admin", ikoon: Shield, telling: kerkraad.length },
         ]}
       />
 
@@ -78,7 +90,7 @@ export function InstellingsOortjies() {
                   defaultValue="Welkom by ons gemeente! Ons is bly om jou hier te hê en sien uit daarna om jou beter te leer ken." />
               </Veld>
               <Knop soort="primer" ikoon={Save} className="self-start"
-                onClick={() => wys(DEMO("Instellings gestoor"))}>Stoor instellings</Knop>
+                onClick={() => wys("Gemeente-instellings word nog nie gestoor nie.", "info")}>Stoor instellings</Knop>
             </div>
           </Paneel>
 
@@ -114,7 +126,7 @@ export function InstellingsOortjies() {
                 <Knop ikoon={Copy} onClick={kopieer}>
                   {gekopieer ? "Gekopieer" : "Kopieer skakel"}
                 </Knop>
-                <Knop ikoon={ExternalLink} onClick={() => wys(DEMO("Registrasiebladsy sou oopmaak"), "info")}>Open</Knop>
+                <Knop ikoon={ExternalLink} onClick={() => window.open("/registreer", "_blank")}>Open</Knop>
                 <Knop ikoon={QrCode} onClick={() => setQr(true)}>Skep QR-kode</Knop>
               </div>
               <div className="border-line bg-was-wyn/40 mt-1 flex items-start gap-2.5 rounded-lg border px-3.5 py-2.5">
@@ -162,8 +174,8 @@ export function InstellingsOortjies() {
                 </tr>
               </thead>
               <tbody className="divide-line divide-y">
-                {KERKRAAD.map((g) => (
-                  <tr key={g.epos} className="hover:bg-stage/50 transition-colors">
+                {kerkraad.map((g) => (
+                  <tr key={g.id} className="hover:bg-stage/50 transition-colors">
                     <td className="px-4 py-2.5 sm:px-5">
                       <span className="flex items-center gap-2.5 font-medium">
                         <span aria-hidden className="boog-vorm bg-was-saffier text-glas-saffier ring-line flex size-8 items-center justify-center text-xs font-semibold ring-1">
@@ -174,10 +186,16 @@ export function InstellingsOortjies() {
                     </td>
                     <td className="text-ink-muted px-3 py-2.5">{g.epos}</td>
                     <td className="px-4 py-2.5 sm:px-5">
-                      <Kenteken toon={g.rol === "Admin" ? "saffier" : "neutraal"}
-                        ikoon={g.rol === "Admin" ? Shield : Users}>
-                        {g.rol}
-                      </Kenteken>
+                      {isAdmin && g.id !== myId ? (
+                        <RolKies lid={g} />
+                      ) : (
+                        <Kenteken
+                          toon={g.rol === "admin" ? "saffier" : "neutraal"}
+                          ikoon={g.rol === "admin" ? Shield : Users}
+                        >
+                          {ROLLE.find((r) => r.waarde === g.rol)?.etiket ?? g.rol}
+                        </Kenteken>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -205,7 +223,7 @@ function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
       return;
     }
     setFout(undefined);
-    wys(DEMO(`Uitnodiging aan ${epos} gestuur`));
+    wys("Uitnodigings word in Supabase → Authentication → Users gedoen.", "info");
     setEpos("");
     sluit();
   }
@@ -226,8 +244,11 @@ function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
         </Veld>
         <Veld etiket="Rol" hulp="Admin kan gebruikers bestuur en instellings verander.">
           <Kies defaultValue="ouderling">
-            <option value="admin">Admin</option>
-            <option value="ouderling">Ouderling</option>
+            {ROLLE.map((r) => (
+              <option key={r.waarde} value={r.waarde}>
+                {r.etiket}
+              </option>
+            ))}
           </Kies>
         </Veld>
       </form>
@@ -235,4 +256,39 @@ function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
   );
 }
 
+/**
+ * 'n Admin kan 'n ander lid se rol hier verander.
+ *
+ * Nie vir jouself nie — die aksie weier dit ook bedienerkant, sodat die laaste
+ * admin nie per ongeluk sy eie regte kan wegneem nie.
+ */
+function RolKies({ lid }: { lid: KerkraadLid }) {
+  const { wys } = useMelding();
+  const [besig, setBesig] = useState(false);
 
+  async function verander(rol: string) {
+    setBesig(true);
+    const uitslag = await stelGebruikerRol(lid.id, rol);
+    setBesig(false);
+    wys(
+      uitslag.ok ? `${lid.naam} se rol is opgedateer.` : uitslag.fout,
+      uitslag.ok ? undefined : "fout",
+    );
+  }
+
+  return (
+    <Kies
+      aria-label={`Rol vir ${lid.naam}`}
+      defaultValue={lid.rol}
+      disabled={besig}
+      onChange={(e) => verander(e.target.value)}
+      className="h-9! text-sm"
+    >
+      {ROLLE.map((r) => (
+        <option key={r.waarde} value={r.waarde}>
+          {r.etiket}
+        </option>
+      ))}
+    </Kies>
+  );
+}

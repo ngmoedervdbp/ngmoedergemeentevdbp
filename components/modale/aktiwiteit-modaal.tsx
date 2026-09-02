@@ -9,7 +9,7 @@ import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
 import { useMelding } from "@/components/ui/melding";
 import { stoorAktiwiteit } from "@/lib/data/aksies";
 import { BEDIENING_TIPE_LYS, LIDMAAT_TIPES } from "@/lib/bediening";
-import type { BedieningAktiwiteit } from "@/lib/mock/bediening";
+import type { BedieningAktiwiteit } from "@/lib/tipes/bediening";
 
 const VORM_ID = "aktiwiteit-vorm";
 

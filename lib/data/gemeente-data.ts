@@ -9,7 +9,7 @@ import type {
   Lid,
   Registrasie,
   Wyk,
-} from "@/lib/mock/tipes";
+} from "@/lib/tipes/gemeente";
 
 /**
  * Die gemeentedata uit Supabase.

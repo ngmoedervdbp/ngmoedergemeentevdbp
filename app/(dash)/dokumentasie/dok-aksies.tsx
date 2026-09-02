@@ -5,7 +5,7 @@ import { Download, Plus, Upload } from "lucide-react";
 import { Knop } from "@/components/ui/basis";
 import { Modaal } from "@/components/ui/modaal";
 import { Invoer, Teksarea, Veld } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
 import { OplaaiModaal } from "@/components/modale/algemene-modale";
 
 export function OplaaiKnop({ titel, vervang }: { titel: string; vervang?: boolean }) {
@@ -24,10 +24,10 @@ export function OplaaiKnop({ titel, vervang }: { titel: string; vervang?: boolea
   );
 }
 
-export function AflaaiKnop({ titel }: { titel: string }) {
+export function AflaaiKnop() {
   const { wys } = useMelding();
   return (
-    <Knop grootte="sm" ikoon={Download} onClick={() => wys(DEMO(`${titel} sou afgelaai word`), "info")}>
+    <Knop grootte="sm" ikoon={Download} onClick={() => wys("Aflaai benodig Supabase Storage — nog nie gekoppel nie.", "info")}>
       Laai af
     </Knop>
   );
@@ -43,7 +43,7 @@ export function VoegDokumentKnop() {
     e.preventDefault();
     if (!titel.trim()) { setFout("Titel is verpligtend."); return; }
     setFout(undefined);
-    wys(DEMO(`“${titel}” bygevoeg`));
+    wys("Oplaai benodig Supabase Storage — nog nie gekoppel nie.", "info");
     setTitel("");
     setOop(false);
   }

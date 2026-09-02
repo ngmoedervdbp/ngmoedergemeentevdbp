@@ -5,7 +5,7 @@ import { Knop } from "@/components/ui/basis";
 import { BevestigModaal } from "@/components/modale/algemene-modale";
 import { useMelding } from "@/components/ui/melding";
 import { volleNaam } from "@/lib/data/afleidings";
-import type { Lid } from "@/lib/mock/tipes";
+import type { Lid } from "@/lib/tipes/gemeente";
 import { stelLidmaatStatus } from "@/lib/data/aksies";
 
 export function HeraktiveerKnop({ lid }: { lid: Lid }) {

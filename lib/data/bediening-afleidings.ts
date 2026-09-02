@@ -3,7 +3,7 @@ import type {
   AfspraakStatus,
   BedieningAktiwiteit,
   BedieningTipe,
-} from "@/lib/mock/bediening-tipes";
+} from "@/lib/tipes/bediening";
 
 /**
  * Afleidings oor die bedieningsdata.

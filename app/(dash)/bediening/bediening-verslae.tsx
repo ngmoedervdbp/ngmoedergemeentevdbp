@@ -4,11 +4,10 @@ import { useMemo, useState } from "react";
 import { Download, FileText, Printer } from "lucide-react";
 import { Knop, Paneel, PaneelKop } from "@/components/ui/basis";
 import { useMelding } from "@/components/ui/melding";
-import { DEMO } from "@/components/ui/melding";
 import { BEDIENING_TIPES } from "@/lib/bediening";
 import { GLAS } from "@/lib/glas";
 import { fmtDatum, fmtGetal } from "@/lib/format";
-import type { BedieningAktiwiteit, BedieningTipe } from "@/lib/mock/bediening";
+import type { BedieningAktiwiteit, BedieningTipe } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
 type Tydperk = "vandag" | "week" | "maand" | "dae30";
@@ -50,7 +49,7 @@ export function BedieningVerslae({
               soort="sekonder"
               grootte="sm"
               ikoon={Printer}
-              onClick={() => wys(DEMO("Druk"))}
+              onClick={() => wys("Druk is nog nie gebou nie.", "info")}
             >
               Druk
             </Knop>
@@ -58,7 +57,7 @@ export function BedieningVerslae({
               soort="sekonder"
               grootte="sm"
               ikoon={Download}
-              onClick={() => wys(DEMO("Word-uitvoer"))}
+              onClick={() => wys("Word-uitvoer is nog nie gebou nie.", "info")}
             >
               Word
             </Knop>
@@ -66,7 +65,7 @@ export function BedieningVerslae({
               soort="sekonder"
               grootte="sm"
               ikoon={FileText}
-              onClick={() => wys(DEMO("PDF-uitvoer"))}
+              onClick={() => wys("PDF-uitvoer is nog nie gebou nie.", "info")}
             >
               PDF
             </Knop>

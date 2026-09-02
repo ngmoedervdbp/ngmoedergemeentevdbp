@@ -32,8 +32,8 @@ const BORREL = [
   { ikoon: CalendarDays, toon: GLAS.violet, wasKlas: "bg-was-violet", etiket: "Byeenkomste" },
 ];
 
-export function Bento() {
-  const komende = komendePubliek(5);
+export async function Bento() {
+  const komende = await komendePubliek(5);
 
   return (
     <section className="veilig-kant mx-auto w-full max-w-6xl px-4 pt-24 sm:px-6 sm:pt-32 lg:px-8">

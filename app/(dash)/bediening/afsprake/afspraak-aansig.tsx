@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Kenteken, Leeg, Paneel } from "@/components/ui/basis";
 import { AFSPRAAK_FILTERS, AFSPRAAK_STATUSSE, type AfspraakFilter } from "@/lib/bediening";
 import { fmtDatum, fmtTydreeks } from "@/lib/format";
-import type { Afspraak, AfspraakStatus } from "@/lib/mock/bediening";
+import type { Afspraak, AfspraakStatus } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
 /** Die kentekentoon per status — Kenteken se eie tone, nie die glaspalet nie. */

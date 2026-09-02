@@ -14,8 +14,11 @@
  * verstek-vals is die punt: vergeet iemand, lek niks.
  */
 
-import { GEBEURTENISSE, type Gebeurtenis } from "@/lib/mock";
-import type { GebeurtenisKategorie } from "@/lib/mock/tipes";
+import { haalGebeurtenisse } from "@/lib/data/gemeente-data";
+import type {
+  Gebeurtenis,
+  GebeurtenisKategorie,
+} from "@/lib/tipes/gemeente";
 
 /** Kategorieë wat op die publieke werf gewys mag word. */
 const PUBLIEKE_KATEGORIEE: GebeurtenisKategorie[] = [
@@ -51,27 +54,27 @@ function isPubliek(g: Gebeurtenis) {
  * `vandag` is inspuitbaar sodat dit toetsbaar is en nie op die bediener se
  * klok staatmaak nie.
  */
-export function komendePubliek(
+export async function komendePubliek(
   aantal = 6,
   vandag = new Date(),
-): PubliekeGebeurtenis[] {
+): Promise<PubliekeGebeurtenis[]> {
   const vandagISO = vandag.toISOString().slice(0, 10);
+  const gebeurtenisse = await haalGebeurtenisse();
 
-  return GEBEURTENISSE.filter(isPubliek)
-    .filter((g) => g.datum >= vandagISO)
-    .sort((a, b) => a.datum.localeCompare(b.datum) || (a.tyd ?? "").localeCompare(b.tyd ?? ""))
+  return gebeurtenisse
+    .filter(isPubliek)
+    .filter((g: Gebeurtenis) => g.datum >= vandagISO)
+    .sort((a: Gebeurtenis, b: Gebeurtenis) => a.datum.localeCompare(b.datum) || (a.tyd ?? "").localeCompare(b.tyd ?? ""))
     .slice(0, aantal);
 }
 
 /** Alle publieke gebeurtenisse in 'n gegewe maand, vir die maandaansig. */
-export function publiekInMaand(jaar: number, maand: number) {
+export async function publiekInMaand(jaar: number, maand: number) {
   const voorvoegsel = `${jaar}-${String(maand + 1).padStart(2, "0")}`;
-  return GEBEURTENISSE.filter(isPubliek)
-    .filter((g) => g.datum.startsWith(voorvoegsel))
-    .sort((a, b) => a.datum.localeCompare(b.datum) || (a.tyd ?? "").localeCompare(b.tyd ?? ""));
+  const gebeurtenisse = await haalGebeurtenisse();
+  return gebeurtenisse
+    .filter(isPubliek)
+    .filter((g: Gebeurtenis) => g.datum.startsWith(voorvoegsel))
+    .sort((a: Gebeurtenis, b: Gebeurtenis) => a.datum.localeCompare(b.datum) || (a.tyd ?? "").localeCompare(b.tyd ?? ""));
 }
 
-/** Hoeveel gebeurtenisse die filter weggehou het — nuttig om te sien dit werk. */
-export function privaatGetel() {
-  return GEBEURTENISSE.length - GEBEURTENISSE.filter(isPubliek).length;
-}

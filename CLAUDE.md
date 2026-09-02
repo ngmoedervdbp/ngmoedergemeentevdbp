@@ -9,17 +9,19 @@ Replaces a Base44 prototype that stored everything in Google Sheets.
 
 Full page-by-page inventory of the app we're replacing: `docs/base44-reference/notes.md`.
 
-> **Status: MVP op spotdata.** All twelve *admin* pages are built and navigable against a
-> mock dataset in `lib/mock/`. **There is still no database.** Every page reads from
-> `lib/mock/index.ts`, whose query helpers deliberately mirror the shape a Supabase
-> query will return, so swapping them out is mechanical. Buttons that would mutate
-> (Stoor, Keur goed, Heraktiveer, Laai op) are inert.
+> **Status: op Supabase.** Die migrasies is gedraai en die app lees en skryf regtig.
+> `lib/mock/` bestaan nie meer nie.
 >
-> SQL migrations exist in `supabase/migrations/` but **have never been run** — no
-> local Postgres, no linked project. Treat them as a draft schema, not as truth.
+> - **Lees** — `lib/data/gemeente-data.ts` en `lib/data/bediening-data.ts` haal die rye;
+>   `lib/data/afleidings.ts` doen die berekeninge as suiwer funksies oor daardie rye.
+>   Die afleidings weet niks van die databron nie, wat die omruil klein gehou het.
+> - **Skryf** — `lib/data/aksies.ts` (Server Actions). Elke aksie revalideer sy bladsy.
+> - **Tipes** — `lib/tipes/`.
 >
-> **The public website and the ministry tracker are not built yet.** See "Scope — the
-> three parts" below; both are planned, neither is designed.
+> **Nog nie gebou nie** (die knoppies sê dit eerlik): dokument-oplaai (benodig
+> Supabase Storage), PDF/Word-uitvoere, e-poskommunikasie (benodig 'n diens soos
+> Resend), ligging-naspeuring en iCal-sinkronisasie, en kategese-indeling.
+
 
 ## Stack
 
@@ -138,7 +140,8 @@ database:
 
 ### 1. Public website — the community front door
 
-**Not built yet.** Anyone can reach it, no login. This is the part the wider community
+**Built.** Tuis, Oor ons, Eredienste, Kalender, Bedienings, Kontak, plus the
+registration form. Anyone can reach it, no login. This is the part the wider community
 sees, so **UI design carries real weight here** — it is a shopfront, not an admin form.
 
 - It reads published content only. It must never expose lidmaat PII — no member lists,

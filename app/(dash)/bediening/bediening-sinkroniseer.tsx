@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, Info, RefreshCw } from "lucide-react";
 import { Knop, Paneel, PaneelKop } from "@/components/ui/basis";
 import { Veld, Invoer } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
 
 /**
  * iCal-sinkronisasie: lees 'n gepubliseerde iCloud-kalender in sodat gebeure
@@ -42,7 +42,7 @@ export function BedieningSinkroniseer() {
           className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            wys(DEMO("Kalender gesinkroniseer"));
+            wys("iCal-sinkronisasie is nog nie gebou nie.", "info");
           }}
         >
           <Veld
@@ -63,7 +63,7 @@ export function BedieningSinkroniseer() {
               type="button"
               soort="sekonder"
               ikoon={Check}
-              onClick={() => wys(DEMO("URL gestoor"))}
+              onClick={() => wys("Die URL word nog nie gestoor nie.", "info")}
             >
               Stoor URL
             </Knop>

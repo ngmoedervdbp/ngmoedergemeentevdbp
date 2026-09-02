@@ -6,7 +6,8 @@ import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { navVanHrefs } from "@/lib/nav";
 import { tekenUit } from "@/app/(dash)/uitteken-aksie";
 import { fmtDatum } from "@/lib/format";
-import { LEDE, volleNaam, voorletters } from "@/lib/mock";
+import { volleNaam, voorletters } from "@/lib/data/afleidings";
+import type { Lid } from "@/lib/tipes/gemeente";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,6 +20,7 @@ export function BoBalk({
   navHrefs,
   gebruiker,
   rolEtiket,
+  lede: alleLede,
   openNav,
 }: {
   /**
@@ -29,6 +31,8 @@ export function BoBalk({
   navHrefs: string[];
   gebruiker: string;
   rolEtiket: string;
+  /** Vir die soekpalet — uit die uitleg, nie 'n module-vlak skikking nie. */
+  lede: Lid[];
   openNav: () => void;
 }) {
   const nav = useMemo(() => navVanHrefs(navHrefs), [navHrefs]);
@@ -61,7 +65,7 @@ export function BoBalk({
     ? nav.filter((n) => n.etiket.toLowerCase().includes(skoon)).slice(0, 4)
     : [];
   const lede = skoon
-    ? LEDE.filter((l) => volleNaam(l).toLowerCase().includes(skoon)).slice(0, 6)
+    ? alleLede.filter((l) => volleNaam(l).toLowerCase().includes(skoon)).slice(0, 6)
     : [];
 
   function gaan(href: string) {

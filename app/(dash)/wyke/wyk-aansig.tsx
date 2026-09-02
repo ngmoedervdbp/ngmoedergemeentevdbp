@@ -6,9 +6,11 @@ import { LayoutGrid, List, Pencil, Plus, Printer, Shuffle, Trash2 } from "lucide
 import { LidmaatAvatar } from "@/components/kerk/lidmaat-avatar";
 import { Kenteken, Knop, Paneel, Vordering } from "@/components/ui/basis";
 import { BevestigModaal, WykModaal } from "@/components/modale/algemene-modale";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { veeWykUit } from "@/lib/data/aksies";
 import { Tabelrol } from "@/components/ui/tabel";
-import { volleNaam, type Lid, type Wyk } from "@/lib/mock";
+import { type Lid, type Wyk } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 import { cn } from "@/lib/utils";
 
 type WykMetLede = Wyk & { tel: number; lede: Lid[] };
@@ -36,7 +38,7 @@ export function WykAansig({ wyke }: { wyke: WykMetLede[] }) {
 
         <div className="ml-auto flex w-full flex-wrap gap-2 sm:w-auto [&>*]:flex-1 sm:[&>*]:flex-none">
           <Knop ikoon={Shuffle} grootte="sm" onClick={() => setVerdeel(true)}>Verdeel lidmate</Knop>
-          <Knop ikoon={Printer} grootte="sm" onClick={() => wys(DEMO("Wyklys sou gedruk word"), "info")}>
+          <Knop ikoon={Printer} grootte="sm" onClick={() => wys("Druk is nog nie gebou nie.", "info")}>
             Druk wyklys
           </Knop>
           <Knop soort="primer" ikoon={Plus} grootte="sm" onClick={() => setNuut(true)}>Nuwe wyk</Knop>
@@ -169,7 +171,11 @@ export function WykAansig({ wyke }: { wyke: WykMetLede[] }) {
           </>
         }
         bevestigEtiket="Skrap wyk"
-        opBevestig={() => wys(DEMO(`${skrap?.naam} geskrap`), "info")}
+        opBevestig={async () => {
+          if (!skrap) return;
+          const u = await veeWykUit(skrap.id);
+          wys(u.ok ? `${skrap.naam} geskrap.` : u.fout, u.ok ? undefined : "fout");
+        }}
       />
 
       <BevestigModaal
@@ -178,7 +184,7 @@ export function WykAansig({ wyke }: { wyke: WykMetLede[] }) {
         titel="Verdeel lidmate in wyke"
         beskrywing="Lidmate sonder 'n wyk word outomaties versprei op grond van hul gesin se adres. Bestaande toewysings bly onaangeraak."
         bevestigEtiket="Verdeel"
-        opBevestig={() => wys(DEMO("Lidmate sou verdeel word"))}
+        opBevestig={() => wys("Outomatiese verdeling is nog nie gebou nie.", "info")}
       />
     </>
   );

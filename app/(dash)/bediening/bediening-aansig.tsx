@@ -18,7 +18,7 @@ import type {
   Afspraak,
   BedieningAktiwiteit,
   BedieningTipe,
-} from "@/lib/mock/bediening";
+} from "@/lib/tipes/bediening";
 import { AktiwiteitLys } from "./aktiwiteit-lys";
 import { BedieningVerslae } from "./bediening-verslae";
 import { BedieningLigging } from "./bediening-ligging";

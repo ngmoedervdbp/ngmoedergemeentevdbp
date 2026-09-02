@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 import { Kenteken, Knop, Leeg, Paneel, PaneelKop } from "@/components/ui/basis";
 import { fmtDatum } from "@/lib/format";
-import type { Gebeurtenis, GebeurtenisKategorie } from "@/lib/mock";
+import type { Gebeurtenis, GebeurtenisKategorie } from "@/lib/tipes/gemeente";
 import { cn } from "@/lib/utils";
 
 const KATEGORIEE = [

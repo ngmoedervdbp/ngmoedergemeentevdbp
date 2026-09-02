@@ -6,8 +6,8 @@ import { Paneel } from "@/components/ui/basis";
 import { BEDIENING_TIPES, BEDIENING_TIPE_LYS } from "@/lib/bediening";
 import { GLAS } from "@/lib/glas";
 import { fmtDatum, fmtTydreeks } from "@/lib/format";
-import { isoDatum } from "@/lib/mock/bediening";
-import type { BedieningAktiwiteit } from "@/lib/mock/bediening";
+import { isoDatum } from "@/lib/data/bediening-afleidings";
+import type { BedieningAktiwiteit } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
 const DAE = ["Ma", "Di", "Wo", "Do", "Vr", "Sa", "So"];

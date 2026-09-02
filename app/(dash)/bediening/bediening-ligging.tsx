@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Crosshair, Info, MapPin } from "lucide-react";
 import { Knop, Leeg, Paneel, PaneelKop } from "@/components/ui/basis";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
 
 /**
  * Ligging-opsporing.
@@ -25,11 +25,10 @@ export function BedieningLigging() {
     const nuut = !outomaties;
     setOutomaties(nuut);
     wys(
-      DEMO(
-        nuut
-          ? "Outomatiese naspeuring aangeskakel"
-          : "Outomatiese naspeuring afgeskakel",
-      ),
+      nuut
+        ? "Ligging-naspeuring is nog nie gebou nie."
+        : "Naspeuring afgeskakel.",
+      "info",
     );
   }
 
@@ -81,7 +80,7 @@ export function BedieningLigging() {
           <Knop
             soort="sekonder"
             ikoon={Crosshair}
-            onClick={() => wys(DEMO("Ligging aangeteken"))}
+            onClick={() => wys("Ligging-aantekening is nog nie gebou nie.", "info")}
             className="w-full sm:w-auto"
           >
             Teken huidige ligging aan

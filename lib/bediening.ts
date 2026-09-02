@@ -24,7 +24,7 @@ import type {
   AfspraakStatus,
   BedieningLidmaatTipe,
   BedieningTipe,
-} from "@/lib/mock/bediening-tipes";
+} from "@/lib/tipes/bediening";
 import type { GlasToon } from "@/lib/glas";
 
 type TipeInfo = {

@@ -11,18 +11,25 @@ import { Kenteken, KnopSkakel, Paneel, PaneelKop } from "@/components/ui/basis";
 import { AantekeningKnop, WysigKnop } from "./lid-aksies";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
 import {
-  familyPerId, ledeInFamily, lidPerId, volleNaam, wykPerId, LEDE,
-} from "@/lib/mock";
+  familyPerId, ledeInFamily, lidPerId, volleNaam, wykPerId,
+} from "@/lib/data/afleidings";
+import {
+  haalFamilies, haalLede, haalWyke,
+} from "@/lib/data/gemeente-data";
 
-export function generateStaticParams() {
-  return LEDE.map((l) => ({ id: l.id }));
-}
+/**
+ * Geen `generateStaticParams` nie: die lidmaatlys leef in die databasis en
+ * verander deur die dag. 'n Vooraf-gebakte stel roetes sou verouderd wees
+ * sodra iemand 'n lidmaat byvoeg.
+ */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/lidmate/[id]">,
 ): Promise<Metadata> {
   const { id } = await props.params;
-  const lid = lidPerId(id);
+  const lede = await haalLede();
+  const lid = lidPerId(lede, id);
   return { title: lid ? volleNaam(lid) : "Lidmaat" };
 }
 
@@ -30,12 +37,17 @@ const ROL_ETIKET = { man: "Man", vrou: "Vrou", kind: "Kind" } as const;
 
 export default async function LidmaatBladsy(props: PageProps<"/lidmate/[id]">) {
   const { id } = await props.params;
-  const lid = lidPerId(id);
+  const [LEDE, WYKE, FAMILIES] = await Promise.all([
+    haalLede(),
+    haalWyke(),
+    haalFamilies(),
+  ]);
+  const lid = lidPerId(LEDE, id);
   if (!lid) notFound();
 
-  const wyk = wykPerId(lid.wyk_id);
-  const family = familyPerId(lid.family_id);
-  const gesinslede = family ? ledeInFamily(family.id).filter((l) => l.id !== lid.id) : [];
+  const wyk = wykPerId(WYKE, lid.wyk_id);
+  const family = familyPerId(FAMILIES, lid.family_id);
+  const gesinslede = family ? ledeInFamily(LEDE, family.id).filter((l) => l.id !== lid.id) : [];
   const ouderdom = berekenOuderdom(lid.date_of_birth);
 
   return (

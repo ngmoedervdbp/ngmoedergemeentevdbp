@@ -1,5 +1,5 @@
 import { BEDIENING_TIPES } from "@/lib/bediening";
-import type { BedieningTipe } from "@/lib/mock/bediening-tipes";
+import type { BedieningTipe } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
 /**

@@ -6,7 +6,7 @@ import { Kenteken, Leeg, Paneel } from "@/components/ui/basis";
 import { BedieningChip } from "@/components/kerk/bediening-chip";
 import { BEDIENING_TIPE_LYS, BEDIENING_TIPES, LIDMAAT_TIPES } from "@/lib/bediening";
 import { fmtDatum, fmtDuur, fmtTydreeks } from "@/lib/format";
-import type { BedieningAktiwiteit, BedieningTipe } from "@/lib/mock/bediening";
+import type { BedieningAktiwiteit, BedieningTipe } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
 /**

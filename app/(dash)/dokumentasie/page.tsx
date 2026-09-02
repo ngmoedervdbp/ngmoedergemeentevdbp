@@ -67,7 +67,7 @@ export default async function DokumentasieBladsy() {
                         {d.lêernaam} · {d.grootte} · {fmtDatum(d.opgelaai)}
                       </p>
                       <div className="flex shrink-0 gap-2">
-                        <AflaaiKnop titel={d.titel} />
+                        <AflaaiKnop />
                         <OplaaiKnop titel={d.titel} vervang />
                       </div>
                     </div>
@@ -102,7 +102,7 @@ export default async function DokumentasieBladsy() {
                     {d.beskrywing} · {d.grootte} · {fmtDatum(d.opgelaai)}
                   </p>
                 </div>
-                <AflaaiKnop titel={d.titel} />
+                <AflaaiKnop />
               </li>
             ))}
           </ul>

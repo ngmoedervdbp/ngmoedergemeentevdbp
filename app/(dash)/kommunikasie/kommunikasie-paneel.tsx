@@ -5,8 +5,9 @@ import { CheckSquare, Mail, MessageCircle, Search, Send, Square, TriangleAlert }
 import { LidmaatAvatar } from "@/components/kerk/lidmaat-avatar";
 import { Kenteken, Knop, Paneel, PaneelKop } from "@/components/ui/basis";
 import { BevestigModaal } from "@/components/modale/algemene-modale";
-import { DEMO, useMelding } from "@/components/ui/melding";
-import { volleNaam, type Lid } from "@/lib/mock";
+import { useMelding } from "@/components/ui/melding";
+import { type Lid } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 import { cn } from "@/lib/utils";
 
 export function KommunikasiePaneel({ lede }: { lede: Lid[] }) {
@@ -133,7 +134,7 @@ export function KommunikasiePaneel({ lede }: { lede: Lid[] }) {
           titel="Stuur e-pos"
           beskrywing={<>Die boodskap gaan na <strong className="text-ink font-semibold">{metEpos}</strong> lidmate met &apos;n e-posadres. Die {gekies.size - metEpos} sonder een word oorgeslaan.</>}
           bevestigEtiket={`Stuur ${metEpos} e-posse`}
-          opBevestig={() => wys(DEMO(`${metEpos} e-posse sou gestuur word`))}
+          opBevestig={() => wys("E-pos benodig 'n e-posdiens — nog nie gekoppel nie.", "info")}
         />
 
         <BevestigModaal
@@ -141,7 +142,7 @@ export function KommunikasiePaneel({ lede }: { lede: Lid[] }) {
           titel="Open WhatsApp"
           beskrywing={<>WhatsApp Web maak oop met die <strong className="text-ink font-semibold">eerste</strong> lidmaat se nommer. Die res moet een vir een gedoen word — ware massa-WhatsApp vereis die betaalde Business API.</>}
           bevestigEtiket="Open WhatsApp"
-          opBevestig={() => wys(DEMO("WhatsApp Web sou oopmaak"), "info")}
+          opBevestig={() => wys("Gebruik die WhatsApp-knoppie by elke lidmaat.", "info")}
         />
 
         {gekies.size > 0 ? (

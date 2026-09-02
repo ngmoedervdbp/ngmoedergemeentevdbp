@@ -406,3 +406,156 @@ function leegNaNull(v: FormDataEntryValue | null): string | null {
   const s = String(v ?? "").trim();
   return s === "" ? null : s;
 }
+
+/* -------------------------------------------------------------- gebruikers */
+
+/**
+ * Verander 'n kerkraadslid se rol.
+ *
+ * Slegs 'n admin mag dit — beide hier en in RLS (die "admin bestuur profiele"
+ * beleid in migrasie 011).
+ */
+export async function stelGebruikerRol(
+  id: string,
+  rol: string,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  if (sessie.gebruiker.rol !== "admin") {
+    return { ok: false, fout: "Net 'n admin kan rolle verander." };
+  }
+
+  // Moenie jouself uit admin skop nie — dan kan niemand meer rolle bestuur nie.
+  if (id === sessie.gebruiker.id && rol !== "admin") {
+    return {
+      ok: false,
+      fout: "Jy kan nie jou eie admin-regte verwyder nie.",
+    };
+  }
+
+  const { error } = await sessie.supabase
+    .from("profiles")
+    .update({ rol })
+    .eq("id", id);
+
+  if (error) return fouthantering("stelGebruikerRol", error);
+
+  revalidatePath("/instellings");
+  return { ok: true };
+}
+
+/**
+ * Werk 'n kerkraadslid se naam by.
+ *
+ * Die profiel word deur die sneller in 010 geskep met net 'n e-pos; iemand
+ * moet die naam invul sodat die app nie 'n e-posadres as 'n naam wys nie.
+ */
+export async function stoorGebruikerNaam(
+  id: string,
+  first_name: string,
+  last_name: string,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  const { error } = await sessie.supabase
+    .from("profiles")
+    .update({
+      first_name: first_name.trim() || null,
+      last_name: last_name.trim() || null,
+    })
+    .eq("id", id);
+
+  if (error) return fouthantering("stoorGebruikerNaam", error);
+
+  revalidatePath("/instellings");
+  return { ok: true };
+}
+
+/** Voeg 'n pastorale aantekening by 'n lidmaat se rekord. */
+export async function stoorAantekening(
+  id: string,
+  aantekeninge: string,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  const { error } = await sessie.supabase
+    .from("lede")
+    .update({ aantekeninge: aantekeninge.trim() || null })
+    .eq("id", id);
+
+  if (error) return fouthantering("stoorAantekening", error);
+
+  revalidatePath(`/lidmate/${id}`);
+  return { ok: true };
+}
+
+/* ---------------------------------------------------------------- kategese */
+
+export async function stoorKategeseGroep(
+  data: FormData,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  const id = String(data.get("id") ?? "");
+  const ry = {
+    naam: String(data.get("naam") ?? "").trim(),
+    ouderdomsgroep: leegNaNull(data.get("ouderdomsgroep")),
+    onderwyser: leegNaNull(data.get("onderwyser")),
+    lokaal: leegNaNull(data.get("lokaal")),
+    dag: leegNaNull(data.get("dag")),
+    tyd: leegNaNull(data.get("tyd")),
+  };
+
+  if (!ry.naam) return { ok: false, fout: "Groepnaam is verpligtend." };
+
+  const { error } = id
+    ? await sessie.supabase.from("kategese_groups").update(ry).eq("id", id)
+    : await sessie.supabase.from("kategese_groups").insert(ry);
+
+  if (error) return fouthantering("stoorKategeseGroep", error);
+
+  revalidatePath("/kategese");
+  return { ok: true };
+}
+
+/** Deel 'n kind by 'n kategesegroep in (of haal hom uit). */
+export async function stelKategeseLid(
+  kategese_group_id: string,
+  lid_id: string,
+  binne: boolean,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  const { error } = binne
+    ? await sessie.supabase
+        .from("kategese_group_lede")
+        .upsert({ kategese_group_id, lid_id })
+    : await sessie.supabase
+        .from("kategese_group_lede")
+        .delete()
+        .eq("kategese_group_id", kategese_group_id)
+        .eq("lid_id", lid_id);
+
+  if (error) return fouthantering("stelKategeseLid", error);
+
+  revalidatePath("/kategese");
+  return { ok: true };
+}
+
+/** Skrap 'n wyk. Lidmate se `wyk_id` word null (on delete set null). */
+export async function veeWykUit(id: string): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  const { error } = await sessie.supabase.from("wyke").delete().eq("id", id);
+  if (error) return fouthantering("veeWykUit", error);
+
+  revalidatePath("/wyke");
+  revalidatePath("/lidmate");
+  return { ok: true };
+}

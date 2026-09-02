@@ -97,4 +97,3 @@ function Strook({ item, sluit }: { item: Item; sluit: () => void }) {
 }
 
 /** Standaard bewoording sodat elke skerm dieselfde eerlike storie vertel. */
-export const DEMO = (wat: string) => `${wat} — demo, daar is nog geen databasis nie.`;

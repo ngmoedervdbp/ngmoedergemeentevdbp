@@ -5,9 +5,11 @@ import { NotebookPen, Pencil } from "lucide-react";
 import { Knop } from "@/components/ui/basis";
 import { Modaal } from "@/components/ui/modaal";
 import { Teksarea, Veld } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { stoorAantekening } from "@/lib/data/aksies";
 import { LidmaatModaal } from "@/components/modale/lidmaat-modaal";
-import { volleNaam, type Lid } from "@/lib/mock";
+import { type Lid } from "@/lib/tipes/gemeente";
+import { volleNaam } from "@/lib/data/afleidings";
 
 export function WysigKnop({ lid }: { lid: Lid }) {
   const [oop, setOop] = useState(false);
@@ -24,10 +26,19 @@ export function AantekeningKnop({ lid }: { lid: Lid }) {
   const [teks, setTeks] = useState("");
   const { wys } = useMelding();
 
-  function stoor(e: React.FormEvent) {
+  const [besig, setBesig] = useState(false);
+
+  async function stoor(e: React.FormEvent) {
     e.preventDefault();
     if (!teks.trim()) return;
-    wys(DEMO("Aantekening gestoor"));
+    setBesig(true);
+    const uitslag = await stoorAantekening(lid.id, teks);
+    setBesig(false);
+    if (!uitslag.ok) {
+      wys(uitslag.fout, "fout");
+      return;
+    }
+    wys("Aantekening gestoor.");
     setTeks("");
     setOop(false);
   }
@@ -46,7 +57,7 @@ export function AantekeningKnop({ lid }: { lid: Lid }) {
         voet={
           <>
             <Knop soort="stil" onClick={() => setOop(false)}>Kanselleer</Knop>
-            <Knop type="submit" form="nota-vorm" soort="primer" disabled={!teks.trim()}>
+            <Knop type="submit" form="nota-vorm" soort="primer" disabled={besig || !teks.trim()}>
               Stoor aantekening
             </Knop>
           </>

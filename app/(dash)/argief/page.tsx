@@ -9,12 +9,20 @@ import { StatusKenteken } from "@/components/kerk/status-kenteken";
 import { Leeg, Paneel } from "@/components/ui/basis";
 import { Tabelrol } from "@/components/ui/tabel";
 import { fmtMaandJaar } from "@/lib/format";
-import { geargiveerdeLede, telPerStatus, volleNaam, wykPerId } from "@/lib/mock";
+import { geargiveerdeLede, telPerStatus, volleNaam, wykPerId } from "@/lib/data/afleidings";
+import { haalLede, haalWyke } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Argief" };
 
-export default function ArgiefBladsy() {
-  const lede = geargiveerdeLede();
+export const dynamic = "force-dynamic";
+
+export default async function ArgiefBladsy() {
+  const [LEDE, WYKE] = await Promise.all([
+    haalLede(),
+    haalWyke(),
+  ]);
+
+  const lede = geargiveerdeLede(LEDE);
 
   return (
     <>
@@ -35,9 +43,9 @@ export default function ArgiefBladsy() {
 
       <div className="grid gap-4 sm:grid-cols-4">
         <StatTeel etiket="Totale argief" waarde={lede.length} ikoon={Archive} tint="saffier" />
-        <StatTeel etiket="Onaktief" waarde={telPerStatus("onaktief")} ikoon={Archive} tint="kobalt" />
-        <StatTeel etiket="Oorgeplaas" waarde={telPerStatus("oorgeplaas")} ikoon={Archive} tint="amber" />
-        <StatTeel etiket="Oorlede" waarde={telPerStatus("oorlede")} ikoon={Archive} tint="wyn" />
+        <StatTeel etiket="Onaktief" waarde={telPerStatus(LEDE, "onaktief")} ikoon={Archive} tint="kobalt" />
+        <StatTeel etiket="Oorgeplaas" waarde={telPerStatus(LEDE, "oorgeplaas")} ikoon={Archive} tint="amber" />
+        <StatTeel etiket="Oorlede" waarde={telPerStatus(LEDE, "oorlede")} ikoon={Archive} tint="wyn" />
       </div>
 
       <Paneel className="overflow-hidden">
@@ -59,7 +67,7 @@ export default function ArgiefBladsy() {
               </thead>
               <tbody className="divide-line divide-y">
                 {lede.map((l) => {
-                  const wyk = wykPerId(l.wyk_id);
+                  const wyk = wykPerId(WYKE, l.wyk_id);
                   return (
                     <tr key={l.id} className="hover:bg-stage/50 transition-colors">
                       <td className="px-4 py-2.5 sm:px-5">

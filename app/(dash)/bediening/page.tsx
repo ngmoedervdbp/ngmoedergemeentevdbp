@@ -4,12 +4,11 @@ import { CalendarDays, Clock, MapPin, TrendingUp } from "lucide-react";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { StatTeel } from "@/components/kerk/stat-teel";
 import {
-  aktiwiteite,
   aktiwiteiteHierdieWeek,
-  afsprake,
   bedieningOorsig,
   tellingPerTipe,
-} from "@/lib/mock/bediening";
+} from "@/lib/data/bediening-afleidings";
+import { haalAfsprake, haalAktiwiteite } from "@/lib/data/bediening-data";
 import { BedieningAansig } from "./bediening-aansig";
 import { huidigeGebruiker, magBediening } from "@/lib/sessie";
 
@@ -30,11 +29,14 @@ export default async function BedieningBladsy() {
   // bladsy sy data haal en in die RSC-vrag stuur nie.
   if (!magBediening(await huidigeGebruiker())) notFound();
 
-  const lys = aktiwiteite();
-  const week = aktiwiteiteHierdieWeek();
+  const [lys, afsprakeLys] = await Promise.all([
+    haalAktiwiteite(),
+    haalAfsprake(),
+  ]);
+
+  const week = aktiwiteiteHierdieWeek(lys);
   const oorsig = bedieningOorsig(lys);
   const perTipe = tellingPerTipe(lys);
-  const afsprakeLys = afsprake();
 
   return (
     <>

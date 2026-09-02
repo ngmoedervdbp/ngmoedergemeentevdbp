@@ -9,20 +9,25 @@ import { GroeiGrafiek, HorisontaleStaaf, Legende, RingGrafiek, StaafGrafiek } fr
 import { Tabelrol } from "@/components/ui/tabel";
 import { GLAS } from "@/lib/glas";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
-import {
-  aktieweLede, geslagsTellings, groeiPerMaand, ouderdomsGroepTellings,
-  ouderdomsOorsig, wykTellings,
-} from "@/lib/mock";
+import { aktieweLede, geslagsTellings, groeiPerMaand, ouderdomsGroepTellings, ouderdomsOorsig, wykTellings } from "@/lib/data/afleidings";
+import { haalLede, haalWyke } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Verslae" };
 
-export default function VerslaeBladsy() {
-  const o = ouderdomsOorsig();
-  const geslag = geslagsTellings();
-  const groepe = ouderdomsGroepTellings();
-  const wyke = wykTellings().map((w) => ({ naam: w.naam.replace("Wyk ", ""), waarde: w.tel }));
-  const sonderDatum = aktieweLede().filter((l) => !l.date_of_birth);
-  const kinders = aktieweLede()
+export const dynamic = "force-dynamic";
+
+export default async function VerslaeBladsy() {
+  const [LEDE, WYKE] = await Promise.all([
+    haalLede(),
+    haalWyke(),
+  ]);
+
+  const o = ouderdomsOorsig(LEDE);
+  const geslag = geslagsTellings(LEDE);
+  const groepe = ouderdomsGroepTellings(LEDE);
+  const wyke = wykTellings(WYKE, LEDE).map((w) => ({ naam: w.naam.replace("Wyk ", ""), waarde: w.tel }));
+  const sonderDatum = aktieweLede(LEDE).filter((l) => !l.date_of_birth);
+  const kinders = aktieweLede(LEDE)
     .filter((l) => { const a = berekenOuderdom(l.date_of_birth); return a !== null && a < 18; })
     .sort((a, b) => (berekenOuderdom(a.date_of_birth) ?? 0) - (berekenOuderdom(b.date_of_birth) ?? 0));
 
@@ -42,7 +47,7 @@ export default function VerslaeBladsy() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Paneel>
           <PaneelKop titel="Lidmaatgroei" byskrif="Nuwe lidmate per maand, laaste 12 maande" />
-          <div className="px-3 py-4"><GroeiGrafiek data={groeiPerMaand()} /></div>
+          <div className="px-3 py-4"><GroeiGrafiek data={groeiPerMaand(LEDE)} /></div>
         </Paneel>
 
         <Paneel>

@@ -3,12 +3,21 @@ import { BookOpen, CalendarPlus, GraduationCap, TriangleAlert } from "lucide-rea
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { StatTeel } from "@/components/kerk/stat-teel";
 import { KategeseAansig } from "./kategese-aansig";
-import { GEBEURTENISSE, KATEGESE_GROEPE, kategeseKinders } from "@/lib/mock";
+import { kategeseKinders } from "@/lib/data/afleidings";
+import { haalGebeurtenisse, haalKategeseGroepe, haalLede } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Kategese" };
 
-export default function KategeseBladsy() {
-  const { inGroep, sonderGroep, alleKinders } = kategeseKinders();
+export const dynamic = "force-dynamic";
+
+export default async function KategeseBladsy() {
+  const [GEBEURTENISSE, KATEGESE_GROEPE, LEDE] = await Promise.all([
+    haalGebeurtenisse(),
+    haalKategeseGroepe(),
+    haalLede(),
+  ]);
+
+  const { inGroep, sonderGroep, alleKinders } = kategeseKinders(KATEGESE_GROEPE, LEDE);
   const jeugGebeure = GEBEURTENISSE
     .filter((g) => g.kategorie === "jeug")
     .sort((a, b) => a.datum.localeCompare(b.datum));

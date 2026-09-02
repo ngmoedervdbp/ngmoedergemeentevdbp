@@ -58,7 +58,13 @@ export const ROL_ETIKET: Record<Rol, string> = {
  * as iemand die URL raai, gee die databasis niks terug nie.
  */
 export function magBediening(gebruiker: Gebruiker | null) {
-  return gebruiker?.rol === "dominee" || gebruiker?.rol === "admin";
+  // Slegs die dominee. 'n Admin is DOELBEWUS uitgesluit: RLS in migrasie 017
+  // is eienaar-alleen, so 'n admin sou net leë skerms sien — die UI en die
+  // databasis moet dieselfde storie vertel.
+  //
+  // Vir ondersteuningswerk gebruik 'n ontwikkelaar die Supabase-paneel met die
+  // service-role-sleutel; dit hoort nie 'n rol in die app te wees nie.
+  return gebruiker?.rol === "dominee";
 }
 
 export function magAdmin(gebruiker: Gebruiker | null) {

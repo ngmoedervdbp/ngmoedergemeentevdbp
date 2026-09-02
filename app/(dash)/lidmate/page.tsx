@@ -2,11 +2,19 @@ import type { Metadata } from "next";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { LidmaatAksies } from "./lidmaat-aksies";
 import { LidmaatLys } from "./lidmaat-lys";
-import { LEDE, REGISTRASIES, WYKE } from "@/lib/mock";
+import { haalLede, haalRegistrasieRye, haalWyke } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Lidmate" };
 
-export default function LidmateBladsy() {
+export const dynamic = "force-dynamic";
+
+export default async function LidmateBladsy() {
+  const [LEDE, REGISTRASIES, WYKE] = await Promise.all([
+    haalLede(),
+    haalRegistrasieRye(),
+    haalWyke(),
+  ]);
+
   return (
     <>
       <BladsyKop

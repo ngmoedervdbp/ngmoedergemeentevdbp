@@ -4,7 +4,7 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useState,
   type ReactNode,
 } from "react";
-import { CircleCheck, Info, X } from "lucide-react";
+import { CircleCheck, Info, TriangleAlert, X } from "lucide-react";
 
 /**
  * Meldings — kort bevestigings ná 'n aksie.
@@ -12,7 +12,9 @@ import { CircleCheck, Info, X } from "lucide-react";
  * Elke aksie in hierdie app is nog demo: daar is geen databasis nie. Die
  * melding sê dit reguit, sodat niemand dink 'n rekord is werklik gestoor nie.
  */
-type Soort = "sukses" | "info";
+// "fout" bygevoeg toe die skryfaksies regtig kon misluk — 'n mislukte stoor
+// mag nie soos 'n sukses lyk nie.
+type Soort = "sukses" | "info" | "fout";
 type Item = { id: number; teks: string; soort: Soort };
 
 const Konteks = createContext<{ wys: (teks: string, soort?: Soort) => void }>({
@@ -57,7 +59,12 @@ function Strook({ item, sluit }: { item: Item; sluit: () => void }) {
     return () => cancelAnimationFrame(t);
   }, []);
 
-  const Ikoon = item.soort === "sukses" ? CircleCheck : Info;
+  const Ikoon =
+    item.soort === "sukses"
+      ? CircleCheck
+      : item.soort === "fout"
+        ? TriangleAlert
+        : Info;
 
   return (
     <div
@@ -67,7 +74,11 @@ function Strook({ item, sluit }: { item: Item; sluit: () => void }) {
     >
       <span
         className={`boog-vorm ring-line mt-0.5 flex size-7 shrink-0 items-center justify-center ring-1 ${
-          item.soort === "sukses" ? "bg-was-groen text-glas-groen" : "bg-was-kobalt text-glas-kobalt"
+          item.soort === "sukses"
+            ? "bg-was-groen text-glas-groen"
+            : item.soort === "fout"
+              ? "bg-was-wyn text-glas-wyn"
+              : "bg-was-kobalt text-glas-kobalt"
         }`}
       >
         <Ikoon size={14} strokeWidth={2} aria-hidden />

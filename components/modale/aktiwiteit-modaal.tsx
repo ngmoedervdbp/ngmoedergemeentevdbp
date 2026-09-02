@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
 import { Crosshair } from "lucide-react";
 import { Knop } from "@/components/ui/basis";
 import { Modaal } from "@/components/ui/modaal";
 import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { stoorAktiwiteit } from "@/lib/data/aksies";
 import { BEDIENING_TIPE_LYS, LIDMAAT_TIPES } from "@/lib/bediening";
 import type { BedieningAktiwiteit } from "@/lib/mock/bediening";
 
@@ -27,7 +30,22 @@ export function AktiwiteitModaal({
   aktiwiteit?: BedieningAktiwiteit | null;
 }) {
   const { wys } = useMelding();
+  const [besig, setBesig] = useState(false);
   const wysig = Boolean(aktiwiteit);
+
+  async function stuur(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setBesig(true);
+    const uitslag = await stoorAktiwiteit(new FormData(e.currentTarget));
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(wysig ? "Aktiwiteit gestoor." : "Aktiwiteit aangeteken.");
+      sluit();
+    } else {
+      wys(uitslag.fout, "fout");
+    }
+  }
 
   return (
     <Modaal
@@ -45,8 +63,8 @@ export function AktiwiteitModaal({
           <Knop soort="sekonder" onClick={sluit}>
             Kanselleer
           </Knop>
-          <Knop type="submit" form={VORM_ID}>
-            {wysig ? "Stoor veranderinge" : "Teken aan"}
+          <Knop type="submit" form={VORM_ID} disabled={besig}>
+            {besig ? "Stoor tans…" : wysig ? "Stoor veranderinge" : "Teken aan"}
           </Knop>
         </>
       }
@@ -54,12 +72,10 @@ export function AktiwiteitModaal({
       <form
         id={VORM_ID}
         className="flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          wys(DEMO(wysig ? "Aktiwiteit gewysig" : "Aktiwiteit aangeteken"));
-          sluit();
-        }}
+        onSubmit={stuur}
       >
+        <input type="hidden" name="id" value={aktiwiteit?.id ?? ""} />
+
         <Veld etiket="Titel" verpligtend hulp="Dikwels 'n naam — werk ook vir iemand wat nie 'n lidmaat is nie.">
           <Invoer
             name="titel"
@@ -140,7 +156,7 @@ export function AktiwiteitModaal({
               soort="sekonder"
               ikoon={Crosshair}
               aria-label="Gebruik huidige ligging"
-              onClick={() => wys(DEMO("Huidige ligging gebruik"))}
+              onClick={() => wys("Ligging word later gekoppel.", "info")}
             />
           </div>
         </Veld>

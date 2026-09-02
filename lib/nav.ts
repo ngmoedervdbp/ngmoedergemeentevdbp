@@ -65,8 +65,9 @@ export const NAV: NavItem[] = [
     etiket: "Bediening",
     href: "/bediening",
     ikoon: HeartHandshake,
-    // Pastorale werk — net die Dominee (en 'n admin) sien dit.
-    rolle: ["dominee", "admin"],
+    // Pastorale werk — net die Dominee. Sien magBediening() in lib/sessie.ts:
+    // RLS is eienaar-alleen, so 'n admin hier sou net leë skerms kry.
+    rolle: ["dominee"],
   },
   { etiket: "Kalender", href: "/kalender", ikoon: Calendar },
   { etiket: "Verslae", href: "/verslae", ikoon: BarChart3 },

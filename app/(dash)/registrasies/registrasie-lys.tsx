@@ -12,7 +12,8 @@ import {
   X,
 } from "lucide-react";
 import { Kenteken, Knop, Leeg, Paneel } from "@/components/ui/basis";
-import { DEMO, useMelding } from "@/components/ui/melding";
+import { useMelding } from "@/components/ui/melding";
+import { keurGoedEnSkepLidmaat, keurRegistrasie } from "@/lib/data/aksies";
 import { berekenOuderdom, fmtDatum, fmtOuderdom } from "@/lib/format";
 import type { Registrasie, RegistrasieStatus } from "@/lib/mock";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,24 @@ export function RegistrasieLys({
   // Standaard op "wagtend" — dit is die werk wat gedoen moet word.
   const [filter, setFilter] = useState<Filter>("wagtend");
   const { wys } = useMelding();
+  const [besigMet, setBesigMet] = useState<string | null>(null);
+
+  async function keurGoed(id: string, naam: string) {
+    setBesigMet(id);
+    const uitslag = await keurGoedEnSkepLidmaat(id);
+    setBesigMet(null);
+    wys(
+      uitslag.ok ? `${naam} is goedgekeur en as lidmaat geskep.` : uitslag.fout,
+      uitslag.ok ? undefined : "fout",
+    );
+  }
+
+  async function keurAf(id: string) {
+    setBesigMet(id);
+    const uitslag = await keurRegistrasie(id, false);
+    setBesigMet(null);
+    wys(uitslag.ok ? "Registrasie afgekeur." : uitslag.fout, uitslag.ok ? undefined : "fout");
+  }
 
   const tellings = useMemo(
     () => ({
@@ -219,9 +238,8 @@ export function RegistrasieLys({
                           soort="primer"
                           grootte="sm"
                           ikoon={Check}
-                          onClick={() =>
-                            wys(DEMO(`${r.first_name} goedgekeur`))
-                          }
+                          disabled={besigMet === r.id}
+                          onClick={() => keurGoed(r.id, r.first_name)}
                         >
                           Keur goed en skep lidmaat
                         </Knop>
@@ -229,7 +247,8 @@ export function RegistrasieLys({
                           soort="gevaar"
                           grootte="sm"
                           ikoon={X}
-                          onClick={() => wys(DEMO("Registrasie afgekeur"))}
+                          disabled={besigMet === r.id}
+                          onClick={() => keurAf(r.id)}
                         >
                           Keur af
                         </Knop>

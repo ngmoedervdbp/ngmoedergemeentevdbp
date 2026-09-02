@@ -6,13 +6,22 @@ import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { LidmaatAvatar } from "@/components/kerk/lidmaat-avatar";
 import { Paneel } from "@/components/ui/basis";
 import { berekenOuderdom, fmtOuderdom } from "@/lib/format";
-import { FAMILIES, ledeInFamily, volleNaam, wykPerId } from "@/lib/mock";
+import { ledeInFamily, volleNaam, wykPerId } from "@/lib/data/afleidings";
+import { haalFamilies, haalLede, haalWyke } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Gesinne" };
 
-export default function GesinneBladsy() {
+export const dynamic = "force-dynamic";
+
+export default async function GesinneBladsy() {
+  const [FAMILIES, LEDE, WYKE] = await Promise.all([
+    haalFamilies(),
+    haalLede(),
+    haalWyke(),
+  ]);
+
   const gesinne = FAMILIES.map((f) => {
-    const lede = ledeInFamily(f.id);
+    const lede = ledeInFamily(LEDE, f.id);
     return {
       ...f,
       egpaar: lede.filter((l) => l.family_role === "man" || l.family_role === "vrou"),
@@ -32,7 +41,7 @@ export default function GesinneBladsy() {
 
       <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {gesinne.map((f) => {
-          const wyk = wykPerId(f.wyk_id);
+          const wyk = wykPerId(WYKE, f.wyk_id);
           return (
             <li key={f.id}>
               <Paneel className="flex h-full flex-col">

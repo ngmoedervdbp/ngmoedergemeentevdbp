@@ -3,14 +3,22 @@ import { MapPinned, TriangleAlert, UserRound } from "lucide-react";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { StatTeel } from "@/components/kerk/stat-teel";
 import { WykAansig } from "./wyk-aansig";
-import { aktieweLede, ledeInWyk, wykTellings } from "@/lib/mock";
+import { aktieweLede, ledeInWyk, wykTellings } from "@/lib/data/afleidings";
+import { haalLede, haalWyke } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Wyke" };
 
-export default function WykeBladsy() {
-  const wyke = wykTellings().map((w) => ({ ...w, lede: ledeInWyk(w.id) }));
-  const toegeken = aktieweLede().filter((l) => l.wyk_id).length;
-  const nieToegeken = aktieweLede().length - toegeken;
+export const dynamic = "force-dynamic";
+
+export default async function WykeBladsy() {
+  const [LEDE, WYKE] = await Promise.all([
+    haalLede(),
+    haalWyke(),
+  ]);
+
+  const wyke = wykTellings(WYKE, LEDE).map((w) => ({ ...w, lede: ledeInWyk(LEDE, w.id) }));
+  const toegeken = aktieweLede(LEDE).filter((l) => l.wyk_id).length;
+  const nieToegeken = aktieweLede(LEDE).length - toegeken;
 
   return (
     <>

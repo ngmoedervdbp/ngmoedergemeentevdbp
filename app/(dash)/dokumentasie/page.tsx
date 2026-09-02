@@ -4,7 +4,7 @@ import { AflaaiKnop, OplaaiKnop, VoegDokumentKnop } from "./dok-aksies";
 import { BladsyKop } from "@/components/kerk/bladsy-kop";
 import { Kenteken, Leeg, Paneel, PaneelKop } from "@/components/ui/basis";
 import { fmtDatum } from "@/lib/format";
-import { DOKUMENTE } from "@/lib/mock";
+import { haalDokumente } from "@/lib/data/gemeente-data";
 
 export const metadata: Metadata = { title: "Dokumentasie" };
 
@@ -15,7 +15,13 @@ const SLEUTEL_IKOON = {
   welkombrief: MailOpen,
 } as const;
 
-export default function DokumentasieBladsy() {
+export const dynamic = "force-dynamic";
+
+export default async function DokumentasieBladsy() {
+  const [DOKUMENTE] = await Promise.all([
+    haalDokumente(),
+  ]);
+
   const vaste = DOKUMENTE.filter((d) => d.sleutel !== null);
   const ander = DOKUMENTE.filter((d) => d.sleutel === null);
 

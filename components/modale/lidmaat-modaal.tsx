@@ -4,8 +4,9 @@ import { useState } from "react";
 import { Modaal } from "@/components/ui/modaal";
 import { Knop } from "@/components/ui/basis";
 import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
-import { DEMO, useMelding } from "@/components/ui/melding";
-import { WYKE, FAMILIES, type Lid } from "@/lib/mock";
+import { useMelding } from "@/components/ui/melding";
+import { stoorLidmaat } from "@/lib/data/aksies";
+import type { Family, Lid, Wyk } from "@/lib/mock/tipes";
 
 /**
  * Een vorm vir "Nuwe lidmaat" en "Wysig lidmaat".
@@ -18,10 +19,15 @@ export function LidmaatModaal({
   oop,
   sluit,
   lid,
+  wyke = [],
+  families = [],
 }: {
   oop: boolean;
   sluit: () => void;
   lid?: Lid;
+  /** Uit die bladsy — die modaal haal nie self data nie. */
+  wyke?: Wyk[];
+  families?: Family[];
 }) {
   const wysig = Boolean(lid);
   const { wys } = useMelding();
@@ -29,7 +35,9 @@ export function LidmaatModaal({
   const [van, setVan] = useState(lid?.last_name ?? "");
   const [foute, setFoute] = useState<{ naam?: string; van?: string }>({});
 
-  function stoor(e: React.FormEvent) {
+  const [besig, setBesig] = useState(false);
+
+  async function stoor(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f: typeof foute = {};
     if (!naam.trim()) f.naam = "Naam is verpligtend.";
@@ -37,8 +45,16 @@ export function LidmaatModaal({
     setFoute(f);
     if (Object.keys(f).length > 0) return;
 
-    wys(DEMO(`${naam} ${van} ${wysig ? "opgedateer" : "bygevoeg"}`));
-    sluit();
+    setBesig(true);
+    const uitslag = await stoorLidmaat(new FormData(e.currentTarget));
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(`${naam} ${van} ${wysig ? "opgedateer" : "bygevoeg"}.`);
+      sluit();
+    } else {
+      wys(uitslag.fout, "fout");
+    }
   }
 
   return (
@@ -51,28 +67,33 @@ export function LidmaatModaal({
       voet={
         <>
           <Knop type="button" soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop type="submit" form="lidmaat-vorm" soort="primer">
-            {wysig ? "Stoor veranderinge" : "Voeg lidmaat by"}
+          <Knop type="submit" form="lidmaat-vorm" soort="primer" disabled={besig}>
+            {besig
+              ? "Stoor tans…"
+              : wysig
+                ? "Stoor veranderinge"
+                : "Voeg lidmaat by"}
           </Knop>
         </>
       }
     >
       <form id="lidmaat-vorm" onSubmit={stoor} className="flex flex-col gap-4" noValidate>
+        <input type="hidden" name="id" value={lid?.id ?? ""} />
         <VeldRy>
           <Veld etiket="Naam" verpligtend fout={foute.naam}>
-            <Invoer value={naam} onChange={(e) => setNaam(e.target.value)} autoComplete="given-name" />
+            <Invoer name="first_name" value={naam} onChange={(e) => setNaam(e.target.value)} autoComplete="given-name" />
           </Veld>
           <Veld etiket="Van" verpligtend fout={foute.van}>
-            <Invoer value={van} onChange={(e) => setVan(e.target.value)} autoComplete="family-name" />
+            <Invoer name="last_name" value={van} onChange={(e) => setVan(e.target.value)} autoComplete="family-name" />
           </Veld>
         </VeldRy>
 
         <VeldRy>
           <Veld etiket="Geboortedatum" hulp="Laat leeg as dit onbekend is — dit word korrek hanteer.">
-            <Invoer type="date" defaultValue={lid?.date_of_birth ?? ""} />
+            <Invoer type="date" name="date_of_birth" defaultValue={lid?.date_of_birth ?? ""} />
           </Veld>
           <Veld etiket="Geslag">
-            <Kies defaultValue={lid?.geslag ?? "manlik"}>
+            <Kies name="geslag" defaultValue={lid?.geslag ?? "manlik"}>
               <option value="manlik">Manlik</option>
               <option value="vroulik">Vroulik</option>
             </Kies>
@@ -81,31 +102,31 @@ export function LidmaatModaal({
 
         <VeldRy>
           <Veld etiket="Selfoon">
-            <Invoer type="tel" autoComplete="tel" defaultValue={lid?.selfoon ?? ""} placeholder="082 123 4567" />
+            <Invoer type="tel" name="selfoon" autoComplete="tel" defaultValue={lid?.selfoon ?? ""} placeholder="082 123 4567" />
           </Veld>
           <Veld etiket="E-pos">
-            <Invoer type="email" autoComplete="email" defaultValue={lid?.epos ?? ""} placeholder="naam@voorbeeld.co.za" />
+            <Invoer type="email" name="epos" autoComplete="email" defaultValue={lid?.epos ?? ""} placeholder="naam@voorbeeld.co.za" />
           </Veld>
         </VeldRy>
 
         <VeldRy>
           <Veld etiket="Wyk">
-            <Kies defaultValue={lid?.wyk_id ?? ""}>
+            <Kies name="wyk_id" defaultValue={lid?.wyk_id ?? ""}>
               <option value="">Geen wyk</option>
-              {WYKE.map((w) => <option key={w.id} value={w.id}>{w.naam}</option>)}
+              {wyke.map((w) => <option key={w.id} value={w.id}>{w.naam}</option>)}
             </Kies>
           </Veld>
           <Veld etiket="Gesin">
-            <Kies defaultValue={lid?.family_id ?? ""}>
+            <Kies name="family_id" defaultValue={lid?.family_id ?? ""}>
               <option value="">Geen gesin</option>
-              {FAMILIES.map((f) => <option key={f.id} value={f.id}>Gesin {f.naam}</option>)}
+              {families.map((f) => <option key={f.id} value={f.id}>Gesin {f.naam}</option>)}
             </Kies>
           </Veld>
         </VeldRy>
 
         <VeldRy>
           <Veld etiket="Rol in gesin">
-            <Kies defaultValue={lid?.family_role ?? ""}>
+            <Kies name="family_role" defaultValue={lid?.family_role ?? ""}>
               <option value="">Geen</option>
               <option value="man">Man</option>
               <option value="vrou">Vrou</option>
@@ -113,7 +134,7 @@ export function LidmaatModaal({
             </Kies>
           </Veld>
           <Veld etiket="Lidmaatskaptipe">
-            <Kies defaultValue={lid?.tipe ?? "belydend"}>
+            <Kies name="tipe" defaultValue={lid?.tipe ?? "belydend"}>
               <option value="belydend">Belydende lidmaat</option>
               <option value="doop">Dooplidmaat</option>
             </Kies>
@@ -122,7 +143,7 @@ export function LidmaatModaal({
 
         <VeldRy>
           <Veld etiket="Status">
-            <Kies defaultValue={lid?.status ?? "aktief"}>
+            <Kies name="status" defaultValue={lid?.status ?? "aktief"}>
               <option value="aktief">Aktief</option>
               <option value="onaktief">Onaktief</option>
               <option value="oorgeplaas">Oorgeplaas</option>
@@ -130,12 +151,12 @@ export function LidmaatModaal({
             </Kies>
           </Veld>
           <Veld etiket="Lid sedert">
-            <Invoer type="date" defaultValue={lid?.lid_sedert ?? ""} />
+            <Invoer type="date" name="lid_sedert" defaultValue={lid?.lid_sedert ?? ""} />
           </Veld>
         </VeldRy>
 
         <Veld etiket="Aantekeninge" hulp="Pastorale notas. POPIA-sensitief — hou dit feitelik.">
-          <Teksarea rows={3} defaultValue={lid?.aantekeninge ?? ""} />
+          <Teksarea name="aantekeninge" rows={3} defaultValue={lid?.aantekeninge ?? ""} />
         </Veld>
       </form>
     </Modaal>

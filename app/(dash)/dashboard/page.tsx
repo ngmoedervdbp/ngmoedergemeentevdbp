@@ -12,8 +12,11 @@ import { KnopSkakel, Kenteken, Leeg, Paneel, PaneelKop } from "@/components/ui/b
 import { fmtDatum, fmtMaandJaar } from "@/lib/format";
 import {
   groeiPerMaand, komendeGebeurtenisse, komendeVerjaarsdae, nuutsteLede,
-  ouderdomsOorsig, telPerStatus, volleNaam, LEDE, REGISTRASIES,
-} from "@/lib/mock";
+  ouderdomsOorsig, telPerStatus, volleNaam,
+} from "@/lib/data/afleidings";
+import {
+  haalGebeurtenisse, haalLede, haalRegistrasieRye,
+} from "@/lib/data/gemeente-data";
 
 const KATEGORIE_TOON = {
   algemeen: "saffier", jeug: "kobalt", seniors: "violet", spesiaal: "oorgeplaas",
@@ -23,12 +26,21 @@ const KATEGORIE_ETIKET = {
   algemeen: "Algemeen", jeug: "Jeug", seniors: "Seniors", spesiaal: "Spesiaal",
 } as const;
 
-export default function DashboardBladsy() {
-  const o = ouderdomsOorsig();
-  const verjaarsdae = komendeVerjaarsdae(21);
-  const gebeure = komendeGebeurtenisse(5);
-  const nuutste = nuutsteLede(5);
-  const groei = groeiPerMaand();
+/** Die tou en tellings verander deur die dag — moenie dit prerender nie. */
+export const dynamic = "force-dynamic";
+
+export default async function DashboardBladsy() {
+  const [LEDE, GEBEURTENISSE, REGISTRASIES] = await Promise.all([
+    haalLede(),
+    haalGebeurtenisse(),
+    haalRegistrasieRye(),
+  ]);
+
+  const o = ouderdomsOorsig(LEDE);
+  const verjaarsdae = komendeVerjaarsdae(LEDE, 21);
+  const gebeure = komendeGebeurtenisse(GEBEURTENISSE, 5);
+  const nuutste = nuutsteLede(LEDE, 5);
+  const groei = groeiPerMaand(LEDE);
   const nuweHierdieJaar = LEDE.filter((l) =>
     l.lid_sedert.startsWith(String(new Date().getFullYear())),
   ).length;
@@ -62,9 +74,9 @@ export default function DashboardBladsy() {
           byskrif={`${LEDE.length} totaal in databasis`} ikoon={Users} tint="saffier" />
         <StatTeel etiket="Nuwe lidmate" waarde={nuweHierdieJaar}
           byskrif="Hierdie jaar" ikoon={UserPlus} tint="groen" />
-        <StatTeel etiket="Oorledenes" waarde={telPerStatus("oorlede")}
+        <StatTeel etiket="Oorledenes" waarde={telPerStatus(LEDE, "oorlede")}
           ikoon={UserMinus} tint="wyn" />
-        <StatTeel etiket="Oorgeplaas" waarde={telPerStatus("oorgeplaas")}
+        <StatTeel etiket="Oorgeplaas" waarde={telPerStatus(LEDE, "oorgeplaas")}
           ikoon={Repeat} tint="amber" />
         <StatTeel etiket="Kinders (onder 13)" waarde={o.kindersOnder13}
           byskrif={`${o.sonderDatum} sonder geboortedatum`} ikoon={Baby} tint="kobalt" />

@@ -45,7 +45,10 @@ export function WagwoordNuutVorm() {
   const [sleutels, setSleutels] = useState<string[]>([]);
 
   useEffect(() => {
-    const supabase = createClient();
+    // `detectSessionInUrl: false` — sien die verduideliking in
+    // lib/supabase/client.ts. Sonder dit weier die kliënt die fragment (hy is
+    // op PKCE) en vee dit uit die URL voor ons dit kan lees.
+    const supabase = createClient({ detectSessionInUrl: false });
     let gestop = false;
 
     // Die luisteraar eerste, sodat 'n sessie wat tydens die inruil opduik nie
@@ -138,11 +141,12 @@ export function WagwoordNuutVorm() {
           return;
         }
         if (!gestop && error) {
+          console.error("[wagwoord-nuut] setSession:", error.message);
           setSessie("nee");
           setUrlBoodskap(
             error.message.toLowerCase().includes("expired")
               ? "Hierdie skakel het verval."
-              : "Hierdie skakel is nie meer geldig nie.",
+              : `Kon nie die skakel gebruik nie (${error.message}).`,
           );
           return;
         }

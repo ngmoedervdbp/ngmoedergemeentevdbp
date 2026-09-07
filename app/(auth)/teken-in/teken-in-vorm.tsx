@@ -31,21 +31,35 @@ export function TekenInVorm() {
           beskermde bladsy onderskep het. */}
       <input type="hidden" name="volgende" value={volgende} />
 
+      {/*
+          `defaultValue` uit die uitslag, want die velde is onbeheer: ná 'n
+          mislukte poging herrender die vorm en sonder dit is albei velde leeg.
+          Om die e-pos te hertik omdat die wagwoord verkeerd was, is irriterend
+          — veral op 'n foon.
+
+          `key` dwing die veld om te herstel wanneer 'n NUWE poging 'n ander
+          e-pos teruggee; sonder dit hou React die ou DOM-waarde.
+      */}
       <Veld etiket="E-posadres">
         <Invoer
+          key={uitslag?.epos ?? ""}
           type="email"
           name="epos"
           placeholder="jou@epos.co.za"
           autoComplete="email"
+          defaultValue={uitslag?.epos ?? ""}
           required
         />
       </Veld>
 
+      {/* Die wagwoord word doelbewus nie herstel nie — dit reis nie terug van
+          die bediener af nie. Outofokus sit die wyser waar die tikwerk is. */}
       <Veld etiket="Wagwoord">
         <Invoer
           type="password"
           name="wagwoord"
           autoComplete="current-password"
+          autoFocus={Boolean(uitslag?.fout)}
           required
         />
       </Veld>

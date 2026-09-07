@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import Link from "next/link";
-import { ArrowLeft, MailCheck } from "lucide-react";
-import { Knop } from "@/components/ui/basis";
+import { ArrowLeft, MailCheck, TriangleAlert } from "lucide-react";
 import { KruisLaaier } from "@/components/ui/kruis-laaier";
 import { Invoer, Veld } from "@/components/ui/vorm";
+import { vraWagwoordHerstel, type HerstelUitslag } from "../teken-in/aksies";
 
 /**
  * Wagwoordherstel.
@@ -16,27 +17,12 @@ import { Invoer, Veld } from "@/components/ui/vorm";
  * inligting wat ons nie weggee nie.
  */
 export function HerstelVorm() {
-  const [epos, setEpos] = useState("");
-  const [besig, setBesig] = useState(false);
-  const [gestuur, setGestuur] = useState(false);
+  const [uitslag, aksie] = useActionState<HerstelUitslag, FormData>(
+    vraWagwoordHerstel,
+    null,
+  );
 
-  async function stuur(e: React.FormEvent) {
-    e.preventDefault();
-    setBesig(true);
-
-    // ---- Vervang met Supabase Auth ------------------------------------
-    // const supabase = createClient();
-    // await supabase.auth.resetPasswordForEmail(epos, {
-    //   redirectTo: `${location.origin}/wagwoord-nuut`,
-    // });
-    await new Promise((r) => setTimeout(r, 700));
-    // -------------------------------------------------------------------
-
-    setBesig(false);
-    setGestuur(true);
-  }
-
-  if (gestuur) {
+  if (uitslag?.ok) {
     return (
       <div className="mt-6 flex flex-col gap-4">
         <div className="border-line bg-was-groen/50 flex gap-3 rounded-xl border p-3.5">
@@ -66,30 +52,31 @@ export function HerstelVorm() {
   }
 
   return (
-    <form onSubmit={stuur} className="mt-6 flex flex-col gap-4" noValidate>
+    <form action={aksie} className="mt-6 flex flex-col gap-4" noValidate>
+      {/* Hou die getikte adres ná 'n fout — dieselfde rede as by aanteken. */}
       <Veld etiket="E-posadres">
         <Invoer
+          key={uitslag && !uitslag.ok ? uitslag.epos : ""}
           type="email"
           name="epos"
-          value={epos}
-          onChange={(e) => setEpos(e.target.value)}
           placeholder="jou@epos.co.za"
           autoComplete="email"
+          defaultValue={uitslag && !uitslag.ok ? uitslag.epos : ""}
           required
-          disabled={besig}
         />
       </Veld>
 
-      <Knop type="submit" soort="primer" disabled={besig} className="w-full">
-        {besig ? (
-          <>
-            <KruisLaaier variant="kring" size="sm" decorative />
-            Stuur tans…
-          </>
-        ) : (
-          "Stuur herstelskakel"
-        )}
-      </Knop>
+      {uitslag && !uitslag.ok ? (
+        <p
+          role="alert"
+          className="text-glas-wyn bg-was-wyn/60 flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm"
+        >
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" aria-hidden />
+          <span className="text-pretty">{uitslag.fout}</span>
+        </p>
+      ) : null}
+
+      <StuurKnop />
 
       <Link
         href="/teken-in"
@@ -99,5 +86,27 @@ export function HerstelVorm() {
         Terug na aanteken
       </Link>
     </form>
+  );
+}
+
+/** Eie komponent — `useFormStatus` werk net binne 'n kind van die `<form>`. */
+function StuurKnop() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-brand focus-visible:outline-accent inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(34,31,38,0.18)] transition-colors hover:bg-[#33326a] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+    >
+      {pending ? (
+        <>
+          <KruisLaaier variant="kring" size="sm" decorative />
+          Stuur tans…
+        </>
+      ) : (
+        "Stuur herstelskakel"
+      )}
+    </button>
   );
 }

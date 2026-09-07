@@ -58,13 +58,29 @@ export const ROL_ETIKET: Record<Rol, string> = {
  * as iemand die URL raai, gee die databasis niks terug nie.
  */
 export function magBediening(gebruiker: Gebruiker | null) {
-  // Slegs die dominee. 'n Admin is DOELBEWUS uitgesluit: RLS in migrasie 017
-  // is eienaar-alleen, so 'n admin sou net leë skerms sien — die UI en die
-  // databasis moet dieselfde storie vertel.
+  // Dominee en admin. Migrasie 021 gee 'n admin leestoegang tot alle
+  // bedieningsrekords, so die UI en die databasis stem ooreen.
   //
-  // Vir ondersteuningswerk gebruik 'n ontwikkelaar die Supabase-paneel met die
-  // service-role-sleutel; dit hoort nie 'n rol in die app te wees nie.
-  return gebruiker?.rol === "dominee";
+  // Skryf bly eienaar-alleen: 'n admin sien die werk, maar teken nie namens
+  // die dominee aan nie.
+  return gebruiker?.rol === "dominee" || gebruiker?.rol === "admin";
+}
+
+/**
+ * Mag hierdie gebruiker data verander?
+ *
+ * admin, dominee en skriba doen die werk; ouderling en kerkraad lees net —
+ * hulle moet 'n nommer kan opsoek voor 'n besoek, nie 'n rekord kan uitvee nie.
+ *
+ * Dit is die UI-kant. Die egte hek is `mag_skryf()` in migrasie 020: al wys
+ * die knoppie, weier die databasis die skryf.
+ */
+export function magSkryf(gebruiker: Gebruiker | null) {
+  return (
+    gebruiker?.rol === "admin" ||
+    gebruiker?.rol === "dominee" ||
+    gebruiker?.rol === "skriba"
+  );
 }
 
 export function magAdmin(gebruiker: Gebruiker | null) {

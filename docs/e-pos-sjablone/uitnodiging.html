@@ -1,0 +1,90 @@
+<!--
+  Supabase → Authentication → Email Templates → "Invite user"
+
+  E-poskliënte is vyandig teenoor moderne CSS. Daarom:
+    * tabelle vir uitleg, nie flex of grid nie
+    * elke styl inlyn — 'n <style>-blok word deur Gmail gestroop
+    * geen webfont nie; Georgia is oral beskikbaar en pas by Spectral
+    * bgcolor-attribute NAAS die CSS, want Outlook ignoreer background-color
+
+  Moet NIE {{ .ConfirmationURL }} verander nie — dit is die hele punt.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f0ece3" style="background-color:#f0ece3;margin:0;padding:32px 12px;">
+  <tr>
+    <td align="center">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background-color:#ffffff;border:1px solid #e1dcd2;border-radius:16px;">
+
+        <!-- Loodbalk bo — die donker raam uit die app -->
+        <tr>
+          <td bgcolor="#1f1d2b" style="background-color:#1f1d2b;height:6px;line-height:6px;font-size:0;border-radius:16px 16px 0 0;">&nbsp;</td>
+        </tr>
+
+        <tr>
+          <td style="padding:36px 36px 8px 36px;text-align:center;">
+            <img src="https://ngmoedergemeentevdbp.vercel.app/logo/ng-merk-256.png"
+                 width="72" height="72" alt=""
+                 style="display:block;margin:0 auto 20px auto;border:0;" />
+
+            <p style="margin:0 0 6px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a8752b;">
+              Sedert 1949 &middot; Vanderbijlpark
+            </p>
+
+            <h1 style="margin:0 0 14px 0;font-family:Georgia,'Times New Roman',serif;font-size:28px;line-height:1.2;font-weight:normal;color:#221f26;">
+              Welkom by <span style="color:#3b3a72;font-style:italic;">Lidmaatbestuur</span>
+            </h1>
+
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#6b6570;">
+              Iemand van die kerkkantoor het jou uitgenooi na die
+              stelsel van NG Moedergemeente Vanderbijlpark.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:26px 36px 30px 36px;text-align:center;">
+            <!-- Knoppie as 'n tabel: Outlook wil nie 'n <a> met padding vul nie -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+              <tr>
+                <td bgcolor="#3b3a72" style="background-color:#3b3a72;border-radius:999px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;padding:14px 30px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">
+                    Kies my wagwoord
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:20px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:#6b6570;">
+              Jy kies self jou wagwoord — niemand anders sien dit nie.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:0 36px;">
+            <div style="height:1px;background-color:#e1dcd2;line-height:1px;font-size:0;">&nbsp;</div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 36px 30px 36px;">
+            <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#6b6570;">
+              Die skakel werk net een keer en verval binne 24 uur. As dit
+              nie meer werk nie, vra die kerkkantoor vir 'n nuwe uitnodiging.
+            </p>
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#6b6570;">
+              Werk die knoppie nie? Plak hierdie skakel in jou blaaier:<br />
+              <a href="{{ .ConfirmationURL }}" style="color:#3b3a72;word-break:break-all;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:20px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#6b6570;text-align:center;">
+        NG Moedergemeente Vanderbijlpark &middot; H/v Faraday &amp; Pasteur Boulevard
+      </p>
+
+    </td>
+  </tr>
+</table>

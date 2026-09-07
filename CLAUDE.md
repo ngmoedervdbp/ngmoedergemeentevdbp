@@ -191,10 +191,18 @@ plus a separate **Afsprake Bestuur** screen.
   already fixed once for ages.
 
 **Privacy — this is the strictest part of the project.** Pastoral work is confidential: a
-hospitaalbesoek reveals an illness, a berading reveals a crisis. RLS in `017` is therefore
-**owner-only** — not the kerkraad, not admin — which deliberately differs from `011`.
-If the gemeente later wants visit *statistics* for the kerkraad, add an aggregate view
-that returns counts only. Do not loosen those policies.
+hospitaalbesoek reveals an illness, a berading reveals a crisis.
+
+`017` was owner-only. **`021` loosened it: an admin may now READ every dominee's
+activities and appointments** — requested by the gemeente, with the Dominee's consent.
+Writing stays owner-only, so an admin never logs on his behalf.
+
+The protection is now administrative rather than technical: give `admin` to as few
+people as possible. **Ligging stays owner-only** and should remain so — a record of where
+someone was every five minutes is a different order of sensitivity to a visit log.
+
+If the kerkraad wants visit *statistics*, add an aggregate view returning counts only
+rather than widening these policies further.
 
 > **Location tracking is the heaviest POPIA item in the codebase.** The demo has an
 > "Outomaties elke 5 minute naspoor" toggle — continuous tracking of a real person.

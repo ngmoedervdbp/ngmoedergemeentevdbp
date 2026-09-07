@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { adminKliënt } from "@/lib/supabase/admin";
-import { huidigeGebruiker, magBediening } from "@/lib/sessie";
+import { huidigeGebruiker, magBediening, magSkryf } from "@/lib/sessie";
 
 /**
  * Skryfaksies vir die admin-app en die bedieningsopsporing.
@@ -25,6 +25,28 @@ const GEEN_SESSIE: AksieUitslag = {
   fout: "Jou sessie het verval. Teken asseblief weer in.",
 };
 
+const GEEN_SKRYFREG: AksieUitslag = {
+  ok: false,
+  fout: "Jy het leesregte — vra 'n skriba of admin om dit te verander.",
+};
+
+/**
+ * Sessie vir 'n SKRYFaksie.
+ *
+ * Elke aksie in hierdie lêer verander data, so die skryfkontrole hoort hier —
+ * een plek wat nie vergeet kan word nie, eerder as twintig herhalings.
+ *
+ * `null`  = geen sessie
+ * `false` = aangeteken maar leesregte alleen
+ */
+async function skryfSessie() {
+  const gebruiker = await huidigeGebruiker();
+  if (!gebruiker) return null;
+  if (!magSkryf(gebruiker)) return false as const;
+  return { supabase: await createClient(), gebruiker };
+}
+
+/** Vir aksies wat hul eie rolkontrole doen (bv. admin-werk). */
 async function kliëntOfNiks() {
   const gebruiker = await huidigeGebruiker();
   if (!gebruiker) return null;
@@ -42,8 +64,9 @@ function fouthantering(konteks: string, error: { code?: string; message: string 
 /* ------------------------------------------------------------------ lidmate */
 
 export async function stoorLidmaat(data: FormData): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -87,8 +110,9 @@ export async function stelLidmaatStatus(
   id: string,
   status: string,
 ): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase
     .from("lede")
@@ -106,8 +130,9 @@ export async function stelLidmaatStatus(
 /* ------------------------------------------------------------------- gesinne */
 
 export async function stoorGesin(data: FormData): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -132,8 +157,9 @@ export async function stoorGesin(data: FormData): Promise<AksieUitslag> {
 /* --------------------------------------------------------------------- wyke */
 
 export async function stoorWyk(data: FormData): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -160,8 +186,9 @@ export async function stoorWyk(data: FormData): Promise<AksieUitslag> {
 /* --------------------------------------------------------------- kalender */
 
 export async function stoorGebeurtenis(data: FormData): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -190,8 +217,9 @@ export async function stoorGebeurtenis(data: FormData): Promise<AksieUitslag> {
 }
 
 export async function veeGebeurtenisUit(id: string): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase.from("events").delete().eq("id", id);
   if (error) return fouthantering("veeGebeurtenisUit", error);
@@ -207,8 +235,9 @@ export async function keurRegistrasie(
   id: string,
   goedgekeur: boolean,
 ): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase
     .from("pending_registrations")
@@ -233,8 +262,9 @@ export async function keurRegistrasie(
  * dit weer kan probeer; dit is die veiliger kant om op te faal.
  */
 export async function keurGoedEnSkepLidmaat(id: string): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { data: reg, error: leesFout } = await sessie.supabase
     .from("pending_registrations")
@@ -292,6 +322,7 @@ export async function stoorAktiwiteit(data: FormData): Promise<AksieUitslag> {
   if (!magBediening(sessie.gebruiker)) {
     return { ok: false, fout: "Jy het nie toegang tot hierdie deel nie." };
   }
+  if (!magSkryf(sessie.gebruiker)) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -332,6 +363,7 @@ export async function veeAktiwiteitUit(id: string): Promise<AksieUitslag> {
   if (!magBediening(sessie.gebruiker)) {
     return { ok: false, fout: "Jy het nie toegang tot hierdie deel nie." };
   }
+  if (!magSkryf(sessie.gebruiker)) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase
     .from("bediening_aktiwiteite")
@@ -350,6 +382,7 @@ export async function stoorAfspraak(data: FormData): Promise<AksieUitslag> {
   if (!magBediening(sessie.gebruiker)) {
     return { ok: false, fout: "Jy het nie toegang tot hierdie deel nie." };
   }
+  if (!magSkryf(sessie.gebruiker)) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -390,6 +423,7 @@ export async function stelAfspraakStatus(
   if (!magBediening(sessie.gebruiker)) {
     return { ok: false, fout: "Jy het nie toegang tot hierdie deel nie." };
   }
+  if (!magSkryf(sessie.gebruiker)) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase
     .from("afsprake")
@@ -479,8 +513,9 @@ export async function stoorAantekening(
   id: string,
   aantekeninge: string,
 ): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase
     .from("lede")
@@ -498,8 +533,9 @@ export async function stoorAantekening(
 export async function stoorKategeseGroep(
   data: FormData,
 ): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const id = String(data.get("id") ?? "");
   const ry = {
@@ -529,8 +565,9 @@ export async function stelKategeseLid(
   lid_id: string,
   binne: boolean,
 ): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = binne
     ? await sessie.supabase
@@ -550,8 +587,9 @@ export async function stelKategeseLid(
 
 /** Skrap 'n wyk. Lidmate se `wyk_id` word null (on delete set null). */
 export async function veeWykUit(id: string): Promise<AksieUitslag> {
-  const sessie = await kliëntOfNiks();
-  if (!sessie) return GEEN_SESSIE;
+  const sessie = await skryfSessie();
+  if (sessie === null) return GEEN_SESSIE;
+  if (sessie === false) return GEEN_SKRYFREG;
 
   const { error } = await sessie.supabase.from("wyke").delete().eq("id", id);
   if (error) return fouthantering("veeWykUit", error);

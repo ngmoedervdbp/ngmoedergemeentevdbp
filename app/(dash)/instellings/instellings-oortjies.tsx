@@ -67,7 +67,19 @@ export function InstellingsOortjies({
         items={[
           { sleutel: "gemeente", etiket: "Gemeente", ikoon: Building2 },
           { sleutel: "registrasie", etiket: "Registrasie", ikoon: Link2 },
-          { sleutel: "admin", etiket: "Admin", ikoon: Shield, telling: kerkraad.length },
+          // Gebruikersbestuur is admin-werk. Die aksies weier dit ook
+          // bedienerkant, maar 'n knoppie wat altyd "nee" sê is 'n slegte
+          // koppelvlak — wys dit eerder nie.
+          ...(isAdmin
+            ? [
+                {
+                  sleutel: "admin" as const,
+                  etiket: "Admin",
+                  ikoon: Shield,
+                  telling: kerkraad.length,
+                },
+              ]
+            : []),
         ]}
       />
 
@@ -163,11 +175,19 @@ export function InstellingsOortjies({
         </div>
       </OortjiePaneel>
 
-      <OortjiePaneel sleutel="admin" aktief={oortjie}>
+      {/* Dubbel-hek: die oortjie is versteek, maar as die toestand ooit op
+          "admin" beland, moet die paneel steeds niks wys nie. */}
+      <OortjiePaneel sleutel={isAdmin ? "admin" : "nooit"} aktief={oortjie}>
         <Paneel>
           <PaneelKop titel="Kerkraadgebruikers"
             byskrif="Toegang is uitnodiging-alleen — daar is geen publieke registrasie nie"
-            aksie={<Knop soort="primer" grootte="sm" ikoon={UserCog} onClick={() => setNooi(true)}>Nooi gebruiker</Knop>} />
+            aksie={
+              isAdmin ? (
+                <Knop soort="primer" grootte="sm" ikoon={UserCog} onClick={() => setNooi(true)}>
+                  Nooi gebruiker
+                </Knop>
+              ) : null
+            } />
           <Tabelrol>
             <table className="w-full min-w-[560px] text-sm">
               <thead className="border-line bg-ground/60 border-b">

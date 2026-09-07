@@ -11,10 +11,19 @@ import { createClient } from "@/lib/supabase/client";
 /**
  * Stel 'n nuwe wagwoord ná 'n uitnodiging of herstel-skakel.
  *
- * Dit MOET 'n kliëntkomponent wees. Supabase sit die eenmalige token in die
- * URL se FRAGMENT (`#access_token=…`), en 'n fragment word nooit na die
- * bediener gestuur nie — net die blaaier sien dit. Die Supabase-kliënt ruil
- * dit self vir 'n sessie in wanneer die bladsy laai.
+ * Dit MOET 'n kliëntkomponent wees: die eenmalige token kom in die URL, en by
+ * die fragment-vorm (`#access_token=…`) sien net die blaaier dit — 'n fragment
+ * word nooit na die bediener gestuur nie.
+ *
+ * Supabase stuur die token op TWEE maniere, afhangend van die vloei:
+ *   1. `?code=…`            — PKCE. Moet uitdruklik ingeruil word.
+ *   2. `#access_token=…`    — die ouer fragment-vorm, outomaties hanteer.
+ *
+ * ⚠ MOENIE `getSession()` een keer op mount roep en die antwoord glo nie.
+ *   Die kliënt het die token dan nog nie verwerk nie, so dit gee `null` terug
+ *   en die bladsy sê "die skakel het verval" oor 'n perfek geldige skakel.
+ *   Dít was 'n regte fout: dieselfde skakel het soms gewerk en soms nie,
+ *   afhangend van watter een eerste klaar was.
  */
 export function WagwoordNuutVorm() {
   const router = useRouter();
@@ -25,19 +34,48 @@ export function WagwoordNuutVorm() {
   const [klaar, setKlaar] = useState(false);
   const [sessie, setSessie] = useState<"wag" | "ja" | "nee">("wag");
 
-  // Wag tot die kliënt die token uit die fragment verwerk het.
   useEffect(() => {
     const supabase = createClient();
+    let gestop = false;
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSessie(data.session ? "ja" : "nee");
-    });
-
+    // Die luisteraar eerste, sodat 'n sessie wat tydens die inruil opduik nie
+    // gemis word nie.
     const { data: luister } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s) setSessie("ja");
+      if (!gestop && s) setSessie("ja");
     });
 
-    return () => luister.subscription.unsubscribe();
+    (async () => {
+      // 1. PKCE: 'n `?code=` moet self ingeruil word.
+      const kode = new URLSearchParams(window.location.search).get("code");
+      if (kode) {
+        const { error } = await supabase.auth.exchangeCodeForSession(kode);
+        if (!gestop && !error) {
+          setSessie("ja");
+          return;
+        }
+      }
+
+      // 2. Fragment-vloei: die kliënt verwerk `#access_token=…` self, maar dit
+      //    is nie noodwendig klaar wanneer hierdie effek loop nie. Peil eerder
+      //    'n paar keer as om een antwoord te glo — 'n vals "verval" is die
+      //    ergste moontlike uitkoms hier.
+      for (let poging = 0; poging < 10; poging++) {
+        if (gestop) return;
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          setSessie("ja");
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 250));
+      }
+
+      if (!gestop) setSessie("nee");
+    })();
+
+    return () => {
+      gestop = true;
+      luister.subscription.unsubscribe();
+    };
   }, []);
 
   async function stuur(e: React.FormEvent) {
@@ -59,7 +97,17 @@ export function WagwoordNuutVorm() {
     setBesig(false);
 
     if (error) {
-      setFout("Kon nie die wagwoord stel nie. Vra vir 'n nuwe skakel.");
+      // Gee die egte rede deur. Die ou boodskap het altyd "vra vir 'n nuwe
+      // skakel" gesê, ook wanneer die wagwoord bloot te swak was — dan vra
+      // iemand 'n nuwe uitnodiging vir 'n probleem wat hy self kon regmaak.
+      const m = error.message.toLowerCase();
+      setFout(
+        m.includes("weak") || m.includes("password")
+          ? "Kies asseblief 'n sterker wagwoord — minstens 8 karakters, en nie 'n algemene woord nie."
+          : m.includes("expired") || m.includes("invalid")
+            ? "Hierdie skakel het verval. Vra die kerkkantoor vir 'n nuwe uitnodiging."
+            : "Kon nie die wagwoord stel nie. Probeer asseblief weer.",
+      );
       return;
     }
 

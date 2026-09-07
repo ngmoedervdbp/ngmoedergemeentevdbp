@@ -21,6 +21,8 @@ const PUBLIEKE_ROETES = [
   "/registreer",
   "/teken-in",
   "/wagwoord-herstel",
+  // 'n Genooide gebruiker is nog nie aangeteken nie wanneer hy hier land.
+  "/wagwoord-nuut",
 ];
 
 function isPubliek(pathname: string) {

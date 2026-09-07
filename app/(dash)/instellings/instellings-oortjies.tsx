@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Building2, Copy, ExternalLink, Link2, QrCode, Save, Shield,
+  Building2, Copy, ExternalLink, KeyRound, Link2, QrCode, Save, Shield,
   Smartphone, UserCog, Users,
 } from "lucide-react";
 import { Kenteken, Knop, Paneel, PaneelKop } from "@/components/ui/basis";
@@ -14,7 +14,11 @@ import { useMelding } from "@/components/ui/melding";
 import { Tabelrol } from "@/components/ui/tabel";
 import type { KerkraadLid } from "@/lib/data/gebruikers";
 import type { Rol } from "@/lib/sessie";
-import { stelGebruikerRol } from "@/lib/data/aksies";
+import {
+  nooiGebruiker,
+  stelGebruikerRol,
+  stuurWagwoordHerstel,
+} from "@/lib/data/aksies";
 
 const REGISTRASIE_URL = "https://ngmoeder.co.za/registreer";
 
@@ -171,6 +175,9 @@ export function InstellingsOortjies({
                   <th scope="col" className="px-4 py-2.5 sm:px-5">Naam</th>
                   <th scope="col" className="px-3 py-2.5">E-pos</th>
                   <th scope="col" className="px-4 py-2.5 sm:px-5">Rol</th>
+                  <th scope="col" className="px-4 py-2.5 sm:px-5">
+                    <span className="sr-only">Aksies</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-line divide-y">
@@ -197,6 +204,9 @@ export function InstellingsOortjies({
                         </Kenteken>
                       )}
                     </td>
+                    <td className="px-4 py-2.5 sm:px-5">
+                      {isAdmin ? <HerstelKnop lid={g} /> : null}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -214,18 +224,29 @@ export function InstellingsOortjies({
 function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
   const { wys } = useMelding();
   const [epos, setEpos] = useState("");
+  const [rol, setRol] = useState<string>("ouderling");
   const [fout, setFout] = useState<string>();
+  const [besig, setBesig] = useState(false);
 
-  function stuur(e: React.FormEvent) {
+  async function stuur(e: React.FormEvent) {
     e.preventDefault();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(epos)) {
       setFout("Voer 'n geldige e-posadres in.");
       return;
     }
     setFout(undefined);
-    wys("Uitnodigings word in Supabase → Authentication → Users gedoen.", "info");
-    setEpos("");
-    sluit();
+
+    setBesig(true);
+    const uitslag = await nooiGebruiker(epos, rol);
+    setBesig(false);
+
+    if (uitslag.ok) {
+      wys(`Uitnodiging aan ${epos} gestuur.`);
+      setEpos("");
+      sluit();
+    } else {
+      setFout(uitslag.fout);
+    }
   }
 
   return (
@@ -234,7 +255,9 @@ function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop type="submit" form="nooi-vorm" soort="primer">Stuur uitnodiging</Knop>
+          <Knop type="submit" form="nooi-vorm" soort="primer" disabled={besig}>
+            {besig ? "Stuur tans…" : "Stuur uitnodiging"}
+          </Knop>
         </>
       }>
       <form id="nooi-vorm" onSubmit={stuur} className="flex flex-col gap-4" noValidate>
@@ -242,8 +265,12 @@ function NooiModaal({ oop, sluit }: { oop: boolean; sluit: () => void }) {
           <Invoer type="email" value={epos} onChange={(e) => setEpos(e.target.value)}
             placeholder="naam@ngmoeder.co.za" />
         </Veld>
+        <p className="text-ink-muted text-xs text-pretty">
+          Hulle kry &apos;n e-pos met &apos;n skakel waar hulle self &apos;n
+          wagwoord kies. Jy sien dit nooit.
+        </p>
         <Veld etiket="Rol" hulp="Admin kan gebruikers bestuur en instellings verander.">
-          <Kies defaultValue="ouderling">
+          <Kies value={rol} onChange={(e) => setRol(e.target.value)}>
             {ROLLE.map((r) => (
               <option key={r.waarde} value={r.waarde}>
                 {r.etiket}
@@ -290,5 +317,39 @@ function RolKies({ lid }: { lid: KerkraadLid }) {
         </option>
       ))}
     </Kies>
+  );
+}
+
+/**
+ * Stuur 'n herstel-skakel — vir wanneer iemand bel en sê hy kan nie inkom nie.
+ *
+ * Ons stel nooit self 'n wagwoord nie; die persoon kies dit op die skakel.
+ */
+function HerstelKnop({ lid }: { lid: KerkraadLid }) {
+  const { wys } = useMelding();
+  const [besig, setBesig] = useState(false);
+
+  async function stuur() {
+    setBesig(true);
+    const uitslag = await stuurWagwoordHerstel(lid.epos);
+    setBesig(false);
+    wys(
+      uitslag.ok
+        ? `Herstel-skakel aan ${lid.epos} gestuur.`
+        : uitslag.fout,
+      uitslag.ok ? undefined : "fout",
+    );
+  }
+
+  return (
+    <Knop
+      soort="sekonder"
+      grootte="sm"
+      ikoon={KeyRound}
+      disabled={besig || !lid.epos}
+      onClick={stuur}
+    >
+      {besig ? "Stuur…" : "Herstel wagwoord"}
+    </Knop>
   );
 }

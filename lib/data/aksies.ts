@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { adminKliënt } from "@/lib/supabase/admin";
 import { huidigeGebruiker, magBediening } from "@/lib/sessie";
 
 /**
@@ -558,4 +559,111 @@ export async function veeWykUit(id: string): Promise<AksieUitslag> {
   revalidatePath("/wyke");
   revalidatePath("/lidmate");
   return { ok: true };
+}
+
+/* ---------------------------------------------------- uitnodigings & wagwoorde */
+
+/**
+ * Nooi 'n nuwe kerkraadslid.
+ *
+ * Supabase stuur die e-pos; die persoon klik die skakel en kies self 'n
+ * wagwoord. Ons sien dit nooit — dit is die punt van 'n uitnodiging eerder as
+ * om 'n wagwoord te skep en dit oor WhatsApp te stuur.
+ *
+ * Die rol word as metadata saamgestuur EN daarna op die profiel gestel: die
+ * sneller in migrasie 010 skep die profiel met die verstek 'kerkraad', so ons
+ * moet dit ná die uitnodiging regstel.
+ */
+export async function nooiGebruiker(
+  epos: string,
+  rol: string,
+): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  if (sessie.gebruiker.rol !== "admin") {
+    return { ok: false, fout: "Net 'n admin kan gebruikers nooi." };
+  }
+
+  const skoon = epos.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(skoon)) {
+    return { ok: false, fout: "Voer 'n geldige e-posadres in." };
+  }
+
+  const admin = adminKliënt();
+  if (!admin) {
+    return {
+      ok: false,
+      fout:
+        "Uitnodigings is nog nie opgestel nie — SUPABASE_SERVICE_ROLE_KEY ontbreek.",
+    };
+  }
+
+  const { data, error } = await admin.auth.admin.inviteUserByEmail(skoon, {
+    redirectTo: `${werfURL()}/wagwoord-nuut`,
+  });
+
+  if (error) {
+    console.error("[nooiGebruiker]", error.message);
+    // Hierdie een is nuttig om deur te gee: "reeds genooi" is iets wat die
+    // admin kan regstel, anders as 'n interne databasisfout.
+    return {
+      ok: false,
+      fout: error.message.toLowerCase().includes("already")
+        ? "Daardie adres is reeds 'n gebruiker."
+        : "Kon nie die uitnodiging stuur nie. Kyk die adres en probeer weer.",
+    };
+  }
+
+  // Die sneller het intussen 'n profiel met rol 'kerkraad' geskep; stel die
+  // gekose rol.
+  if (data.user) {
+    const { error: rolFout } = await admin
+      .from("profiles")
+      .update({ rol })
+      .eq("id", data.user.id);
+    if (rolFout) console.error("[nooiGebruiker/rol]", rolFout.message);
+  }
+
+  revalidatePath("/instellings");
+  return { ok: true };
+}
+
+/**
+ * Stuur 'n wagwoordherstel-skakel.
+ *
+ * Dieselfde vloei as "Wagwoord vergeet?" op die aanteken-bladsy, maar deur 'n
+ * admin begin — vir wanneer iemand bel en sê hulle kan nie inkom nie.
+ */
+export async function stuurWagwoordHerstel(epos: string): Promise<AksieUitslag> {
+  const sessie = await kliëntOfNiks();
+  if (!sessie) return GEEN_SESSIE;
+
+  if (sessie.gebruiker.rol !== "admin") {
+    return { ok: false, fout: "Net 'n admin kan wagwoorde herstel." };
+  }
+
+  const { error } = await sessie.supabase.auth.resetPasswordForEmail(
+    epos.trim().toLowerCase(),
+    { redirectTo: `${werfURL()}/wagwoord-nuut` },
+  );
+
+  if (error) {
+    console.error("[stuurWagwoordHerstel]", error.message);
+    return { ok: false, fout: "Kon nie die skakel stuur nie. Probeer weer." };
+  }
+
+  return { ok: true };
+}
+
+/**
+ * Die werf se eie URL, vir die skakel in die e-pos.
+ *
+ * Vercel stel `VERCEL_PROJECT_PRODUCTION_URL` (sonder skema). Plaaslik val ons
+ * terug op localhost sodat 'n toets-uitnodiging na die dev-bediener wys.
+ */
+function werfURL() {
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+  return process.env.NEXT_PUBLIC_WERF_URL ?? "http://localhost:3000";
 }

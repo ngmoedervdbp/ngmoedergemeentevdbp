@@ -33,6 +33,14 @@ export function WagwoordNuutVorm() {
   const [fout, setFout] = useState<string | null>(null);
   const [klaar, setKlaar] = useState(false);
   const [sessie, setSessie] = useState<"wag" | "ja" | "nee">("wag");
+  const [urlBoodskap, setUrlBoodskap] = useState<string | null>(null);
+  /**
+   * Watter parameters het die skakel werklik gedra. Sonder dit is 'n mislukking
+   * onmoontlik om te diagnoseer: die persoon sien net "verval" en ons weet nie
+   * of daar 'n token was nie. Net die SLEUTELS word gewys, nooit die waardes
+   * nie — die waarde ís die eenmalige token.
+   */
+  const [sleutels, setSleutels] = useState<string[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -45,8 +53,36 @@ export function WagwoordNuutVorm() {
     });
 
     (async () => {
+      const soek = new URLSearchParams(window.location.search);
+      // Die fragment kan óf 'n query-string wees (#access_token=…&type=…) óf
+      // net 'n string; `URLSearchParams` hanteer albei as ons die # afhaal.
+      const brok = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+      setSleutels([
+        ...[...soek.keys()].map((k) => `?${k}`),
+        ...[...brok.keys()].map((k) => `#${k}`),
+      ]);
+
+      // Supabase se eie foute kom óók in die URL. Wys dié eerder as om
+      // stilweg "verval" te sê — "otp_expired" en "access_denied" beteken
+      // verskillende dinge vir die persoon wat dit lees.
+      const urlFout = soek.get("error") ?? brok.get("error");
+      const urlFoutKode =
+        soek.get("error_code") ?? brok.get("error_code") ?? "";
+      if (urlFout) {
+        if (!gestop) {
+          setSessie("nee");
+          setUrlBoodskap(
+            urlFoutKode.includes("expired")
+              ? "Hierdie skakel het verval."
+              : "Hierdie skakel is nie meer geldig nie.",
+          );
+        }
+        return;
+      }
+
       // 1. PKCE: 'n `?code=` moet self ingeruil word.
-      const kode = new URLSearchParams(window.location.search).get("code");
+      const kode = soek.get("code");
       if (kode) {
         const { error } = await supabase.auth.exchangeCodeForSession(kode);
         if (!gestop && !error) {
@@ -55,7 +91,26 @@ export function WagwoordNuutVorm() {
         }
       }
 
-      // 2. Fragment-vloei: die kliënt verwerk `#access_token=…` self, maar dit
+      // 2. `token_hash` + `type` — die vorm wat uitnodigings en herstel-
+      //    skakels gebruik wanneer die projek nie op PKCE is nie.
+      const tokenHash = soek.get("token_hash") ?? brok.get("token_hash");
+      const tipe = (soek.get("type") ?? brok.get("type")) as
+        | "invite"
+        | "recovery"
+        | "email"
+        | null;
+      if (tokenHash && tipe) {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: tipe,
+        });
+        if (!gestop && !error) {
+          setSessie("ja");
+          return;
+        }
+      }
+
+      // 3. Fragment-vloei: die kliënt verwerk `#access_token=…` self, maar dit
       //    is nie noodwendig klaar wanneer hierdie effek loop nie. Peil eerder
       //    'n paar keer as om een antwoord te glo — 'n vals "verval" is die
       //    ergste moontlike uitkoms hier.
@@ -130,16 +185,32 @@ export function WagwoordNuutVorm() {
 
   if (sessie === "nee") {
     return (
-      <p
-        role="alert"
-        className="text-glas-wyn bg-was-wyn/60 mt-6 flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm"
-      >
-        <TriangleAlert size={15} className="mt-0.5 shrink-0" aria-hidden />
-        <span className="text-pretty">
-          Hierdie skakel het verval of is reeds gebruik. Vra die kerkkantoor vir
-          &apos;n nuwe uitnodiging.
-        </span>
-      </p>
+      <div className="mt-6 flex flex-col gap-3">
+        <p
+          role="alert"
+          className="text-glas-wyn bg-was-wyn/60 flex items-start gap-2 rounded-lg px-3 py-2.5 text-sm"
+        >
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" aria-hidden />
+          <span className="text-pretty">
+            {urlBoodskap ??
+              "Hierdie skakel het verval of is reeds gebruik."}{" "}
+            Vra die kerkkantoor vir &apos;n nuwe uitnodiging.
+          </span>
+        </p>
+
+        {/*
+          Die diagnose. 'n Skakel wat GEEN parameters dra nie is 'n ander
+          probleem as een wat 'n verwerpte token dra: die eerste beteken
+          Supabase het die token laat val (die redirect-URL is nie op die
+          witlys nie), die tweede beteken die token self is op. Sonder hierdie
+          reël lyk albei presies dieselfde vir die persoon wat dit rapporteer.
+        */}
+        <p className="text-ink-muted text-xs">
+          {sleutels.length
+            ? `Skakel het gedra: ${sleutels.join(", ")}`
+            : "Die skakel het geen aanmeldkode gedra nie — wys hierdie reël vir die kerkkantoor."}
+        </p>
+      </div>
     );
   }
 

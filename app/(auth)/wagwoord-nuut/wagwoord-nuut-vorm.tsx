@@ -15,9 +15,11 @@ import { createClient } from "@/lib/supabase/client";
  * die fragment-vorm (`#access_token=…`) sien net die blaaier dit — 'n fragment
  * word nooit na die bediener gestuur nie.
  *
- * Supabase stuur die token op TWEE maniere, afhangend van die vloei:
- *   1. `?code=…`            — PKCE. Moet uitdruklik ingeruil word.
- *   2. `#access_token=…`    — die ouer fragment-vorm, outomaties hanteer.
+ * Supabase stuur die token op DRIE maniere, afhangend van die vloei:
+ *   1. `?code=…`                — PKCE. Moet uitdruklik ingeruil word.
+ *   2. `?token_hash=…&type=…`   — verg `verifyOtp`.
+ *   3. `#access_token=…`        — fragment. Moet OOK self gestel word: sien
+ *      die waarskuwing by stap 3 hieronder. Dit is NIE outomaties nie.
  *
  * ⚠ MOENIE `getSession()` een keer op mount roep en die antwoord glo nie.
  *   Die kliënt het die token dan nog nie verwerk nie, so dit gee `null` terug
@@ -110,8 +112,43 @@ export function WagwoordNuutVorm() {
         }
       }
 
-      // 3. Fragment-vloei: die kliënt verwerk `#access_token=…` self, maar dit
-      //    is nie noodwendig klaar wanneer hierdie effek loop nie. Peil eerder
+      // 3. Fragment-vloei: `#access_token=…` + `#refresh_token=…`.
+      //
+      //    ⚠ DIE KLIËNT DOEN DIT NIE SELF NIE. `createBrowserClient` uit
+      //    @supabase/ssr gebruik standaard die PKCE-vloei, en `detect-
+      //    SessionInUrl` lees in daardie modus NET `?code=` — nooit die
+      //    fragment nie. Die token het dus reg daar in die URL gelê terwyl
+      //    `getSession()` niks teruggegee het nie, en die bladsy het "verval"
+      //    gesê oor 'n volkome geldige uitnodiging. Dít was die egte fout.
+      //
+      //    Ons stel die sessie dus self. Doen dit VOOR die peiling: daar is
+      //    niks om vir te wag as die antwoord reeds in die URL staan nie.
+      const toegang = brok.get("access_token");
+      const verfris = brok.get("refresh_token");
+      if (toegang && verfris) {
+        const { error } = await supabase.auth.setSession({
+          access_token: toegang,
+          refresh_token: verfris,
+        });
+        if (!gestop && !error) {
+          // Vee die fragment uit die adresbalk. Dit is 'n lewende token —
+          // dit hoort nie in die geskiedenis of in 'n skermskoot nie.
+          window.history.replaceState(null, "", window.location.pathname);
+          setSessie("ja");
+          return;
+        }
+        if (!gestop && error) {
+          setSessie("nee");
+          setUrlBoodskap(
+            error.message.toLowerCase().includes("expired")
+              ? "Hierdie skakel het verval."
+              : "Hierdie skakel is nie meer geldig nie.",
+          );
+          return;
+        }
+      }
+
+      // 4. Laaste uitweg: die kliënt kón dit tog self verwerk het. Peil eerder
       //    'n paar keer as om een antwoord te glo — 'n vals "verval" is die
       //    ergste moontlike uitkoms hier.
       for (let poging = 0; poging < 10; poging++) {

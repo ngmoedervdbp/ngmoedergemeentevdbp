@@ -23,7 +23,7 @@ export default function KontakBladsy() {
         leiding="Ons kerkgebou staan sedert 1960 op die hoek van Faraday en Pasteur Boulevard."
       />
 
-      <section className="veilig-kant mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+      <section className="site-content">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="onthul glas-kaart border-line bg-surface flex flex-col gap-3 rounded-2xl border p-6">
             <span className="boog-vorm bg-was-saffier text-glas-saffier ring-line flex size-10 items-center justify-center ring-1">
@@ -79,13 +79,10 @@ export default function KontakBladsy() {
           </h2>
           <p className="text-ink-muted mx-auto mt-2.5 max-w-md text-sm text-pretty">
             Los jou besonderhede en die kerkkantoor kom terug na jou toe — of
-            dit nou is om deel te word, oor &apos;n doop te gesels, of net omdat jy
-            iemand nodig het om mee te praat.
+            dit nou is om deel te word, oor &apos;n doop te gesels, of net omdat
+            jy iemand nodig het om mee te praat.
           </p>
-          <Link
-            href="/registreer"
-            className="bg-brand focus-visible:outline-accent mt-5 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_rgba(34,31,38,0.18)] transition-colors hover:bg-[#33326a] focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
+          <Link href="/registreer" className="site-button mt-5">
             Laat ons weet
             <ArrowRight size={16} aria-hidden />
           </Link>

@@ -140,7 +140,10 @@ export function RegistreerVorm() {
 
       {/* Heuningpot — versteek vir mense, sigbaar vir bots. Nie `display:none`
           nie: party bots slaan dít oor. */}
-      <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
+      >
         <label>
           Los hierdie veld leeg
           <input name="webwerf" type="text" tabIndex={-1} autoComplete="off" />
@@ -164,7 +167,7 @@ function StuurKnop() {
       <button
         type="submit"
         disabled={pending}
-        className="group bg-brand focus-visible:outline-accent inline-flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-semibold text-white shadow-[0_2px_20px_-6px_rgba(59,58,114,0.6)] transition-all duration-300 hover:bg-[#33326a] focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+        className="site-button group w-full disabled:opacity-60"
       >
         {pending ? (
           <>
@@ -184,8 +187,8 @@ function StuurKnop() {
       </button>
 
       <p className="text-ink-muted text-center text-xs text-pretty">
-        Ons gebruik jou besonderhede net om met jou in verbinding te tree.
-        Niks word met iemand anders gedeel nie.
+        Ons gebruik jou besonderhede net om met jou in verbinding te tree. Niks
+        word met iemand anders gedeel nie.
       </p>
     </div>
   );

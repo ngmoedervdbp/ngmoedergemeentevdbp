@@ -24,7 +24,7 @@ export default function RegistreerBladsy() {
         leiding="Vul die vorm in en iemand van die kerkkantoor tree met jou in verbinding. Jy hoef nie te wag vir 'n antwoord om by 'n diens in te loer nie."
       />
 
-      <section className="veilig-kant mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-8">
+      <section className="site-content">
         <div className="onthul glas-paneel border-line rounded-[1.5rem] border p-6 sm:p-9">
           <p className="text-ink-muted mb-7 text-sm">
             Velde gemerk met{" "}

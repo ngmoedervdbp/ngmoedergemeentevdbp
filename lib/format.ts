@@ -35,6 +35,31 @@ const tyd = new Intl.DateTimeFormat(LOCALE, {
 
 const getal = new Intl.NumberFormat(LOCALE);
 
+const kalenderDag = new Intl.DateTimeFormat(LOCALE, {
+  day: "numeric",
+  timeZone: TYDSONE,
+});
+const kalenderMaand = new Intl.DateTimeFormat(LOCALE, {
+  month: "short",
+  timeZone: TYDSONE,
+});
+const kalenderWeekdag = new Intl.DateTimeFormat(LOCALE, {
+  weekday: "short",
+  timeZone: TYDSONE,
+});
+
+/** Compact public-calendar labels, always in the congregation's time zone. */
+export function fmtKalenderDatum(waarde: string | Date) {
+  const datum = toDate(waarde);
+  return datum
+    ? {
+        dag: kalenderDag.format(datum),
+        maand: kalenderMaand.format(datum).replace(".", ""),
+        weekdag: kalenderWeekdag.format(datum),
+      }
+    : { dag: "—", maand: "—", weekdag: "—" };
+}
+
 function toDate(waarde: string | Date | null | undefined): Date | null {
   if (!waarde) return null;
   const d = waarde instanceof Date ? waarde : new Date(waarde);
@@ -104,7 +129,9 @@ export const OUDERDOMSGROEPE = [
 
 export type Ouderdomsgroep = (typeof OUDERDOMSGROEPE)[number]["sleutel"];
 
-export function ouderdomsgroepVan(ouderdom: number | null): Ouderdomsgroep | null {
+export function ouderdomsgroepVan(
+  ouderdom: number | null,
+): Ouderdomsgroep | null {
   if (ouderdom === null) return null;
   return (
     OUDERDOMSGROEPE.find((g) => ouderdom >= g.min && ouderdom <= g.maks)

@@ -43,7 +43,7 @@ export default async function KalenderBladsy() {
         leiding="Eredienste, byeenkomste en spesiale geleenthede. Almal is welkom — jy hoef nie te laat weet dat jy kom nie."
       />
 
-      <section className="veilig-kant mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+      <section className="site-content">
         {komende.length === 0 ? (
           <div className="border-line glas-paneel rounded-[1.5rem] border p-10 text-center">
             <span
@@ -130,7 +130,11 @@ export default async function KalenderBladsy() {
                             ) : null}
                             {g.plek ? (
                               <span className="inline-flex min-w-0 items-center gap-1.5">
-                                <MapPin size={13} aria-hidden className="shrink-0" />
+                                <MapPin
+                                  size={13}
+                                  aria-hidden
+                                  className="shrink-0"
+                                />
                                 <span className="truncate">{g.plek}</span>
                               </span>
                             ) : null}

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * gee — vandaar die uitdruklike 16px.
  */
 const INSET =
-  "border-line bg-surface text-ink placeholder:text-ink-muted focus-visible:outline-accent w-full rounded-lg border px-3 text-[16px] sm:text-sm focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:opacity-60";
+  "ui-input border-line bg-surface text-ink placeholder:text-ink-muted focus-visible:outline-accent w-full rounded-lg border px-3 text-[16px] sm:text-sm focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:opacity-60";
 
 export function Veld({
   etiket,
@@ -48,7 +48,10 @@ export function Veld({
  * veld — 'n uitdruklike prop by die oproep wen steeds.
  */
 const RAAK: Partial<
-  Record<string, Pick<ComponentProps<"input">, "inputMode" | "autoCapitalize" | "spellCheck">>
+  Record<
+    string,
+    Pick<ComponentProps<"input">, "inputMode" | "autoCapitalize" | "spellCheck">
+  >
 > = {
   email: { inputMode: "email", autoCapitalize: "none", spellCheck: false },
   tel: { inputMode: "tel" },
@@ -68,7 +71,11 @@ export function Invoer({ className, type, ...res }: ComponentProps<"input">) {
   );
 }
 
-export function Kies({ className, children, ...res }: ComponentProps<"select">) {
+export function Kies({
+  className,
+  children,
+  ...res
+}: ComponentProps<"select">) {
   return (
     <select className={cn(INSET, "h-11 sm:h-10", className)} {...res}>
       {children}
@@ -77,7 +84,12 @@ export function Kies({ className, children, ...res }: ComponentProps<"select">) 
 }
 
 export function Teksarea({ className, ...res }: ComponentProps<"textarea">) {
-  return <textarea className={cn(INSET, "min-h-24 resize-y py-2", className)} {...res} />;
+  return (
+    <textarea
+      className={cn(INSET, "min-h-24 resize-y py-2", className)}
+      {...res}
+    />
+  );
 }
 
 /** Twee velde langs mekaar op groter skerms. */

@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  BookOpen,
+  HandHeart,
+  HeartHandshake,
+  Music,
+  Sprout,
+  Users,
+} from "lucide-react";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { BEDIENINGS } from "@/lib/gemeente";
-import { GLAS } from "@/lib/glas";
 
 export const metadata: Metadata = {
   title: "Bedienings",
@@ -11,14 +18,21 @@ export const metadata: Metadata = {
     "Kategese, jeug, barmhartigheid en meer — die maniere waarop ons gemeente saam werk en omgee.",
 };
 
-/** Elke bediening kry sy eie glastoon, in die volgorde van 'n glasry. */
-const TONE = [
-  GLAS.saffier,
-  GLAS.kobalt,
-  GLAS.groen,
-  GLAS.wyn,
-  GLAS.amber,
-  GLAS.violet,
+const MINISTRY_ICONS = [
+  BookOpen,
+  Sprout,
+  Users,
+  HandHeart,
+  HeartHandshake,
+  Music,
+];
+const MINISTRY_IDS = [
+  "kategese",
+  "jeug",
+  "vroue-en-mansbediening",
+  "barmhartigheid",
+  "seniors",
+  "musiek-en-sang",
 ];
 
 export default function BedieningsBladsy() {
@@ -29,51 +43,38 @@ export default function BedieningsBladsy() {
         titel="Waar jy kan inskakel"
         leiding="'n Gemeente is nie 'n gebou nie — dit is die mense en die werk wat hulle saam doen. Hier is 'n paar plekke waar jy welkom is."
       />
-
-      <section className="veilig-kant mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-        <ul className="grid auto-rows-[minmax(11rem,auto)] gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {BEDIENINGS.map((b, i) => (
-            <li
-              key={b.naam}
-              // Ongelyke selle: die eerste twee dra meer gewig. 'n Rooster
-              // waar elke sel dieselfde grootte is, is 'n tabel, nie 'n bento.
-              className={`onthul glas-kaart glas-paneel border-line flex flex-col gap-2.5 rounded-[1.5rem] border p-5 sm:p-6 ${
-                i === 0 ? "sm:col-span-2" : ""
-              } ${i === 2 ? "lg:row-span-2" : ""}`}
-            >
-              {/* Die lansetboog as klein merk, in dié bediening se toon. */}
-              <span
-                aria-hidden
-                className={`dryf dryf-${(i % 6) + 1} borrel boog-vorm ring-line flex size-11 shrink-0 items-center justify-center ring-1`}
-                style={{ backgroundColor: `${TONE[i % TONE.length]}1a` }}
+      <section className="site-content">
+        <ul className="site-ministry-list">
+          {BEDIENINGS.map((ministry, index) => {
+            const Icon = MINISTRY_ICONS[index % MINISTRY_ICONS.length];
+            return (
+              <li
+                id={MINISTRY_IDS[index]}
+                key={ministry.naam}
+                className="site-ministry onthul"
               >
-                <span
-                  className="size-2.5 rounded-full"
-                  style={{ backgroundColor: TONE[i % TONE.length] }}
-                />
-              </span>
-              <h2 className="font-display text-lg font-semibold">{b.naam}</h2>
-              <p className="text-ink-muted text-sm text-pretty">
-                {b.beskrywing}
-              </p>
-            </li>
-          ))}
+                <span className="site-ministry-number" aria-hidden>
+                  0{index + 1} /
+                </span>
+                <span className="site-ministry-icon">
+                  <Icon size={24} strokeWidth={1.4} aria-hidden />
+                </span>
+                <div>
+                  <h2>{ministry.naam}</h2>
+                  <p>{ministry.beskrywing}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
-
-        <div className="onthul border-line mt-10 rounded-2xl border p-6 text-center sm:p-8">
-          <h2 className="font-display text-xl font-semibold text-balance">
-            Wil jy help, of hulp kry?
-          </h2>
-          <p className="text-ink-muted mx-auto mt-2.5 max-w-md text-sm text-pretty">
+        <div className="site-info-panel onthul mt-10">
+          <h2>Wil jy help, of hulp kry?</h2>
+          <p className="mt-3">
             Albei is welkom, en albei begin met dieselfde gesprek. Laat weet ons
             en iemand kom terug na jou toe.
           </p>
-          <Link
-            href="/kontak"
-            className="text-brand mt-5 inline-flex min-h-[44px] items-center gap-1.5 font-semibold hover:underline"
-          >
-            Kontak ons
-            <ArrowRight size={16} aria-hidden />
+          <Link href="/kontak" className="site-text-link mt-4">
+            Kontak ons <ArrowUpRight size={18} aria-hidden />
           </Link>
         </div>
       </section>

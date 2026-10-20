@@ -19,7 +19,7 @@ export default function EredienssteBladsy() {
         leiding="Jy hoef niks saam te bring nie en niks vooraf te weet nie. Kom soos jy is."
       />
 
-      <section className="veilig-kant mx-auto w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+      <section className="site-content">
         <ul className="flex flex-col gap-3">
           {EREDIENSTE.map((e) => (
             <li
@@ -68,7 +68,11 @@ export default function EredienssteBladsy() {
 
         <div className="border-line mt-6 flex flex-col gap-3 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
           <div className="flex items-start gap-2.5">
-            <MapPin size={17} className="text-ink-muted mt-0.5 shrink-0" aria-hidden />
+            <MapPin
+              size={17}
+              className="text-ink-muted mt-0.5 shrink-0"
+              aria-hidden
+            />
             <p className="text-sm leading-relaxed font-medium">
               {GEMEENTE.adres.straat}
               <br />

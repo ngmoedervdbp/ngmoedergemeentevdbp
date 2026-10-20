@@ -32,7 +32,15 @@ export function Oortjies<T extends string>({
 }) {
   function sleutelaf(e: React.KeyboardEvent, i: number) {
     const rigting =
-      e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : e.key === "Home" ? -i : e.key === "End" ? items.length - 1 - i : 0;
+      e.key === "ArrowRight"
+        ? 1
+        : e.key === "ArrowLeft"
+          ? -1
+          : e.key === "Home"
+            ? -i
+            : e.key === "End"
+              ? items.length - 1 - i
+              : 0;
     if (rigting === 0) return;
     e.preventDefault();
     const volgende = (i + rigting + items.length) % items.length;
@@ -41,7 +49,11 @@ export function Oortjies<T extends string>({
   }
 
   return (
-    <div role="tablist" aria-label={etiket} className="border-line scrollbar-none flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b pb-px">
+    <div
+      role="tablist"
+      aria-label={etiket}
+      className="ui-tabs border-line scrollbar-none flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b pb-px"
+    >
       {items.map((o, i) => {
         const aan = o.sleutel === aktief;
         const Ikoon = o.ikoon;

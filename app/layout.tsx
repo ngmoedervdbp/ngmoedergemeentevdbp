@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1f1d2b",
+  themeColor: "#173e32",
   width: "device-width",
   initialScale: 1,
   // Die kerkraad gebruik dit op selfone met 'n keep — hou inhoud uit die

@@ -37,22 +37,20 @@ export const GEMEENTE = {
 } as const;
 
 /**
- * Die oggenddiens (Sondag 08:15, in die kerkgebou) is BEVESTIG.
- *
- * Die Woensdag-Bybelstudie is nog [AANNAME] — die kerkkantoor moet die tyd en
- * of dit hoegenaamd bestaan bevestig voordat die werf oopgaan.
+ * Die oggenddiens (Sondag 08:30, in die kerkgebou) en die Bybelstudie
+ * (Donderdag 20:00) is BEVESTIG.
  */
 export const EREDIENSTE = [
   {
     dag: "Sondag",
-    tyd: "08:15",
+    tyd: "08:30",
     naam: "Oggenddiens",
     plek: "Kerkgebou, h/v Faraday & Pasteur Boulevard",
     beskrywing: "Ons hoofdiens, met kindertyd en nagmaal op die eerste Sondag.",
   },
   {
-    dag: "Woensdag",
-    tyd: "19:00",
+    dag: "Donderdag",
+    tyd: "20:00",
     naam: "Bybelstudie",
     plek: null,
     beskrywing: "Gesprek rondom die Woord, vir almal wat dieper wil delf.",

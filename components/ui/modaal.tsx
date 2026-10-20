@@ -98,7 +98,7 @@ export function Modaal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center overflow-hidden bg-[#141320]/45 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
+      className="ui-modal-backdrop fixed inset-0 z-50 flex items-end justify-center overflow-hidden bg-[#141320]/45 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) sluit();
       }}
@@ -114,7 +114,7 @@ export function Modaal({
         className={cn(
           // Op 'n foon 'n bodemblad: dit kom uit die duim se rigting, en die
           // voetknoppies bly binne bereik. Van `sm` af 'n gewone dialoog.
-          "border-line bg-surface flex max-h-[92dvh] w-full flex-col rounded-t-2xl border shadow-[0_28px_70px_-20px_rgba(20,19,32,0.5)] outline-none sm:max-h-full sm:rounded-xl",
+          "ui-modal border-line bg-surface flex max-h-[92dvh] w-full flex-col rounded-t-2xl border shadow-[0_28px_70px_-20px_rgba(20,19,32,0.5)] outline-none sm:max-h-full sm:rounded-xl",
           BREEDTES[breedte],
         )}
       >
@@ -127,7 +127,10 @@ export function Modaal({
 
         <div className="border-line flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3.5 sm:gap-4 sm:px-6 sm:py-4">
           <div className="min-w-0">
-            <h2 id={`${id}-titel`} className="font-display text-lg font-semibold text-balance sm:text-xl">
+            <h2
+              id={`${id}-titel`}
+              className="font-display text-lg font-semibold text-balance sm:text-xl"
+            >
               {titel}
             </h2>
             {beskrywing ? (

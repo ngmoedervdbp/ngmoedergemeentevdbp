@@ -60,8 +60,9 @@ export function StatTeel({
 
   return (
     <div
+      data-tint={tint}
       className={cn(
-        "border-line shadow-[0_1px_2px_rgba(34,31,38,0.05)] flex items-start justify-between gap-2 rounded-xl border bg-gradient-to-b via-white via-75% to-white px-3.5 py-3.5 sm:gap-3 sm:px-5 sm:py-4",
+        "admin-stat border-line shadow-[0_1px_2px_rgba(34,31,38,0.05)] flex items-start justify-between gap-2 rounded-xl border bg-gradient-to-b via-white via-75% to-white px-3.5 py-3.5 sm:gap-3 sm:px-5 sm:py-4",
         t.paneel,
       )}
     >

@@ -19,8 +19,7 @@ const KNOP_SOORT = {
   sekonder:
     "bg-surface text-ink border border-line shadow-[0_1px_2px_rgba(34,31,38,0.05)] hover:bg-stage",
   stil: "text-ink-muted hover:bg-stage hover:text-ink",
-  gevaar:
-    "bg-surface text-glas-wyn border border-line hover:bg-was-wyn",
+  gevaar: "bg-surface text-glas-wyn border border-line hover:bg-was-wyn",
 } as const;
 
 const KNOP_GROOTTE = {
@@ -45,10 +44,18 @@ export function Knop({
 }) {
   return (
     <button
-      className={cn(KNOP_BASIS, KNOP_SOORT[soort], KNOP_GROOTTE[grootte], className)}
+      data-variant={soort}
+      className={cn(
+        KNOP_BASIS,
+        KNOP_SOORT[soort],
+        KNOP_GROOTTE[grootte],
+        className,
+      )}
       {...res}
     >
-      {Ikoon ? <Ikoon size={grootte === "sm" ? 14 : 16} strokeWidth={2} aria-hidden /> : null}
+      {Ikoon ? (
+        <Ikoon size={grootte === "sm" ? 14 : 16} strokeWidth={2} aria-hidden />
+      ) : null}
       {children}
     </button>
   );
@@ -68,10 +75,18 @@ export function KnopSkakel({
 }) {
   return (
     <Link
-      className={cn(KNOP_BASIS, KNOP_SOORT[soort], KNOP_GROOTTE[grootte], className)}
+      data-variant={soort}
+      className={cn(
+        KNOP_BASIS,
+        KNOP_SOORT[soort],
+        KNOP_GROOTTE[grootte],
+        className,
+      )}
       {...res}
     >
-      {Ikoon ? <Ikoon size={grootte === "sm" ? 14 : 16} strokeWidth={2} aria-hidden /> : null}
+      {Ikoon ? (
+        <Ikoon size={grootte === "sm" ? 14 : 16} strokeWidth={2} aria-hidden />
+      ) : null}
       {children}
     </Link>
   );
@@ -111,7 +126,7 @@ export function Kenteken({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset",
+        "ui-badge inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset",
         KENTEKEN[toon],
         className,
       )}
@@ -134,7 +149,7 @@ export function Paneel({
   return (
     <section
       className={cn(
-        "border-line bg-surface rounded-xl border shadow-[0_1px_2px_rgba(34,31,38,0.04)]",
+        "ui-panel border-line bg-surface rounded-xl border shadow-[0_1px_2px_rgba(34,31,38,0.04)]",
         className,
       )}
       {...res}
@@ -154,7 +169,7 @@ export function PaneelKop({
   aksie?: ReactNode;
 }) {
   return (
-    <div className="border-line flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-3 sm:px-5 sm:py-3.5">
+    <div className="ui-panel-heading border-line flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-3 sm:px-5 sm:py-3.5">
       <div className="min-w-0 flex-1">
         <h2 className="font-display text-lg leading-snug font-semibold">
           {titel}
@@ -184,7 +199,7 @@ export function Leeg({
   aksie?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5 px-5 py-10 text-center sm:px-6 sm:py-14">
+    <div className="ui-empty flex flex-col items-center justify-center gap-2.5 px-5 py-10 text-center sm:px-6 sm:py-14">
       <span className="boog-vorm bg-stage text-ink-muted ring-line flex size-11 items-center justify-center ring-1">
         <Ikoon size={19} strokeWidth={1.7} aria-hidden />
       </span>

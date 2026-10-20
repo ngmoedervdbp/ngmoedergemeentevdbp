@@ -85,7 +85,7 @@ export default async function DashboardBladsy() {
         </p>
         <BladsyKop
           titel="Dashboard"
-          beskrywing="Welkom terug, Tiaan. Hier is 'n oorsig van jou gemeente."
+          beskrywing="Welkom terug, Tiaan. Hier is 'n oorsig van die gemeente."
           aksies={<DashAksies />}
         />
       </div>

@@ -40,7 +40,7 @@ So: public write-only form + moderation queue. Not authentication.
 ## Pages
 
 ### Dashboard
-"Welkom terug! Hier is 'n oorsig van jou gemeente."
+"Welkom terug! Hier is 'n oorsig van die gemeente."
 - Actions: Excel, Verslag, Lidmateverslag PDF
 - Gradient tiles: Aktiewe Lidmate (15, "17 totaal in databasis"), Nuwe Lidmate (10, hierdie jaar), Oorledenes (0), Oorgeplaas (0), Kinders onder 13 (2), Seniors 60+ (5)
 - Lidmate per Wyk — small count cards per wyk, plus "Geen Wyk"

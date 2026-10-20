@@ -51,13 +51,20 @@ export function LigVenster() {
             d="M112 438V220a148 148 0 0 1 296 0v218Z"
           />
           <circle className="site-window-sun" cx="301" cy="206" r="60" />
-          <path className="site-window-cross" d="M190 160v88m-23-62h46" />
+          <image
+            href="/logo/ng-merk-hero.webp"
+            x="140"
+            y="130"
+            width="240"
+            height="187"
+            preserveAspectRatio="xMidYMid meet"
+          />
           <g className="site-window-stars">
             <path d="M146 207v18m-9-9h18M348 278v18m-9-9h18M246 225v12m-6-6h12" />
           </g>
           <path
             className="site-hill-back"
-            d="M83 368c100-123 172-125 349-9v107H83Z"
+            d="M83 374C153 314 196 296 246 296S356 282 432 359V466H83Z"
           />
           <path
             className="site-hill-front"
@@ -67,7 +74,6 @@ export function LigVenster() {
             className="site-window-path"
             d="M245 438c-12-55-1-84 54-123-26 49-22 78 1 123"
           />
-          <path className="site-window-frame" d="M260 73v365M111 270h298" />
           <path
             d="M112 438V220a148 148 0 0 1 296 0v218Z"
             fill="url(#window-grain)"

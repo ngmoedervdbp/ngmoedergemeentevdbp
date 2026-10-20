@@ -458,12 +458,6 @@
     fill 0.7s,
     transform 1s var(--site-ease);
 }
-.public-site .site-window-cross {
-  stroke: var(--site-forest);
-  stroke-width: 4.5;
-  stroke-linecap: round;
-  transition: stroke 0.7s;
-}
 .public-site .site-hill-back {
   fill: var(--site-lime);
   transition: fill 0.7s;
@@ -473,10 +467,6 @@
 }
 .public-site .site-window-path {
   fill: var(--site-sage);
-}
-.public-site .site-window-frame {
-  stroke: var(--site-forest);
-  stroke-width: 8;
 }
 .public-site .site-window-border {
   stroke: var(--site-forest);
@@ -581,9 +571,6 @@
 }
 .public-site .site-art[data-starlight="true"] .site-window-sky {
   fill: var(--site-forest-deep);
-}
-.public-site .site-art[data-starlight="true"] .site-window-cross {
-  stroke: var(--site-lime);
 }
 .public-site .site-art[data-starlight="true"] .site-window-sun {
   fill: var(--site-paper);

@@ -4,6 +4,8 @@ import { PubliekKop } from "@/components/publiek/publiek-kop";
 import { PubliekVoet } from "@/components/publiek/publiek-voet";
 import { GEMEENTE } from "@/lib/gemeente";
 import { WerfBeweging } from "@/components/publiek/werf-beweging";
+import { ChurchStructuredData } from "@/components/publiek/structured-data";
+import { publicPageMetadata } from "@/lib/seo";
 import "./publiek.css";
 
 const outfit = Outfit({
@@ -23,18 +25,19 @@ const outfit = Outfit({
  * noindex` in die wortel-uitleg kry.
  */
 export const metadata: Metadata = {
+  ...publicPageMetadata("/"),
   title: {
     default: `${GEMEENTE.naam}`,
     template: `%s · ${GEMEENTE.kortNaam}`,
   },
-  description:
-    "'n Gemeente in die hart van Vanderbijlpark sedert 1949. Almal is welkom.",
-  robots: { index: true, follow: true },
+  applicationName: GEMEENTE.naam,
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 };
 
 export default function PubliekLayout({ children }: LayoutProps<"/">) {
   return (
     <div className={`${outfit.variable} public-site flex min-h-dvh flex-col`}>
+      <ChurchStructuredData />
       <a href="#inhoud" className="site-skip">
         Spring na inhoud
       </a>

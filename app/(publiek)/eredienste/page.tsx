@@ -1,22 +1,20 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin } from "lucide-react";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { EREDIENSTE, GEMEENTE } from "@/lib/gemeente";
 
-export const metadata: Metadata = {
-  title: "Eredienste",
-  description:
-    "Wanneer ons saamkom by die NG Moedergemeente Vanderbijlpark, en wat om te verwag as jy die eerste keer kom.",
-};
+export const metadata = publicPageMetadata("/eredienste");
 
 export default function EredienssteBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/eredienste" />
       <PubliekKop
         oortitel="Eredienste"
-        titel="Wanneer ons saamkom"
-        leiding="Jy hoef niks saam te bring nie en niks vooraf te weet nie. Kom soos jy is."
+        titel="Eredienste in Vanderbijlpark"
+        leiding="Soek jy 'n kerk in die Vaal? Kom Sondag saam met ons by NG Moedergemeente. Jy hoef niks vooraf te weet nie. Kom soos jy is."
       />
 
       <section className="site-content">
@@ -49,6 +47,9 @@ export default function EredienssteBladsy() {
             </li>
           ))}
         </ul>
+        <Link href="/bybelstudie" className="site-text-link mt-5">
+          Meer oor Donderdagaand se Bybelstudie <ArrowRight size={16} aria-hidden />
+        </Link>
 
         <div className="onthul border-line bg-was-saffier/40 mt-8 rounded-2xl border p-6 sm:p-8">
           <h2 className="font-display text-xl font-semibold">
@@ -88,6 +89,45 @@ export default function EredienssteBladsy() {
             Kry aanwysings
             <ArrowRight size={15} aria-hidden />
           </Link>
+        </div>
+
+        <section className="site-info-panel mt-8" aria-labelledby="besoek-vrae">
+          <h2 id="besoek-vrae">Jou eerste besoek aan ons kerk</h2>
+          <dl className="mt-5 flex flex-col gap-5">
+            <div>
+              <dt className="font-semibold">Hoe laat begin die Sondagdiens?</dt>
+              <dd className="text-ink-muted mt-1">
+                Ons oggenddiens begin Sondae om {EREDIENSTE[0].tyd}. Tye kan met
+                vakansies en spesiale geleenthede verander; kyk op ons{" "}
+                <a href={GEMEENTE.kontak.facebook} target="_blank" rel="noopener noreferrer" className="underline">
+                  Facebook-blad
+                </a>{" "}
+                vir die jongste aankondigings.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-semibold">Waar in Vanderbijlpark is die kerk?</dt>
+              <dd className="text-ink-muted mt-1">
+                Ons kom saam op die hoek van Faraday en Pasteur Boulevard in
+                Vanderbijlpark, Gauteng. Of jy in Vanderbijlpark woon of van
+                elders in die Vaaldriehoek kom, jy is welkom. Kry die kaart op
+                ons <Link href="/kontak" className="underline">kontakblad</Link>.
+              </dd>
+            </div>
+            <div>
+              <dt className="font-semibold">Moet ek &apos;n lidmaat wees om te kom?</dt>
+              <dd className="text-ink-muted mt-1">
+                Nee. Jy kan &apos;n erediens besoek sonder om eers te registreer.
+                As jy graag wil inskakel, kan jy later{" "}
+                <Link href="/registreer" className="underline">jou besonderhede los</Link>{" "}
+                sodat die kerkkantoor met jou kan gesels.
+              </dd>
+            </div>
+          </dl>
+        </section>
+        <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3">
+          <Link href="/nuut-hier" className="site-text-link">Beplan jou eerste Sondag <ArrowRight size={16} aria-hidden /></Link>
+          <Link href="/vrae" className="site-text-link">Meer vrae oor die gemeente <ArrowRight size={16} aria-hidden /></Link>
         </div>
 
         <p className="text-ink-muted mt-6 inline-flex items-start gap-2 text-xs">

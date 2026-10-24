@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -12,11 +13,7 @@ import {
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { BEDIENINGS } from "@/lib/gemeente";
 
-export const metadata: Metadata = {
-  title: "Bedienings",
-  description:
-    "Kategese, jeug, barmhartigheid en meer — die maniere waarop ons gemeente saam werk en omgee.",
-};
+export const metadata = publicPageMetadata("/bedienings");
 
 const MINISTRY_ICONS = [
   BookOpen,
@@ -38,9 +35,10 @@ const MINISTRY_IDS = [
 export default function BedieningsBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/bedienings" />
       <PubliekKop
         oortitel="Bedienings"
-        titel="Waar jy kan inskakel"
+        titel="Kategese, jeug en bedienings"
         leiding="'n Gemeente is nie 'n gebou nie — dit is die mense en die werk wat hulle saam doen. Hier is 'n paar plekke waar jy welkom is."
       />
       <section className="site-content">
@@ -75,6 +73,9 @@ export default function BedieningsBladsy() {
           </p>
           <Link href="/kontak" className="site-text-link mt-4">
             Kontak ons <ArrowUpRight size={18} aria-hidden />
+          </Link>
+          <Link href="/vrae#kinders-en-jeug" className="site-text-link mt-4 sm:ml-6">
+            Vrae oor Sondagskool en jeug <ArrowUpRight size={18} aria-hidden />
           </Link>
         </div>
       </section>

@@ -11,10 +11,15 @@ import { LigVenster } from "@/components/publiek/lig-venster";
 import { Geskiedenis } from "@/components/publiek/geskiedenis";
 import { KruisMerk } from "@/components/publiek/kruis-merk";
 import { EREDIENSTE, GEMEENTE } from "@/lib/gemeente";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
+
+export const metadata = publicPageMetadata("/");
 
 export default function TuisBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/" />
       <section className="site-shell site-hero">
         <div className="site-hero-copy">
           <p className="site-eyebrow">
@@ -34,8 +39,8 @@ export default function TuisBladsy() {
             <span className="site-hero-serif">by hierdie tafel</span>
           </h1>
           <p className="site-hero-intro">
-            Die moedergemeente van Vanderbijlpark, al meer as sewentig jaar op
-            dieselfde hoek
+            Jou NG kerktuiste in Vanderbijlpark, in die hart van die Vaaldriehoek.
+            Kom deel Sondag saam met ons — daar is plek vir jou.
           </p>
           <div className="site-hero-actions">
             <Link href="/eredienste" className="site-button">
@@ -87,6 +92,11 @@ export default function TuisBladsy() {
               <span className="site-service-time">{service.tyd}</span>
               <h3>{service.naam}</h3>
               <p>{service.beskrywing}</p>
+              {service.naam === "Bybelstudie" && (
+                <Link href="/bybelstudie" className="site-text-link">
+                  Kom lees saam <ArrowUpRight size={17} aria-hidden />
+                </Link>
+              )}
             </div>
           ))}
           <div className="site-service-location">
@@ -105,6 +115,23 @@ export default function TuisBladsy() {
 
       <Bento />
 
+      <section className="site-shell my-12" aria-labelledby="jou-vraag">
+        <h2 id="jou-vraag" className="font-display text-3xl">Waarmee kan ons jou help?</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {[
+            { href: "/nuut-hier", title: "Ek soek 'n kerktuiste", text: "Jou eerste Sondag, kinders saambring en inskakel by die gemeente." },
+            { href: "/bybelstudie", title: "Ek wil saam Bybel lees", text: "Donderdagaand se Bybelstudie en hoe om die eerste keer aan te sluit." },
+            { href: "/vrae", title: "Ek het 'n vraag", text: "Dienstye, kategese, lidmaatskap of navrae oor doop, troues en rou." },
+          ].map((item) => (
+            <Link key={item.href} href={item.href} className="site-info-panel">
+              <h3 className="text-xl">{item.title}</h3>
+              <p className="mt-3">{item.text}</p>
+              <span className="site-text-link mt-4">Lees verder <ArrowUpRight size={18} aria-hidden /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section
         className="site-shell site-story"
         aria-labelledby="verhaal-titel"
@@ -115,7 +142,7 @@ export default function TuisBladsy() {
             Ons verhaal
           </p>
           <h2 id="verhaal-titel">
-            Meer as sewentig jaar <em>op hierdie hoek</em>
+            Sedert 1949 <em>deel van Vanderbijlpark</em>
           </h2>
           <p>
             Die gemeente is in {GEMEENTE.gestig} gestig — dieselfde jaar as die

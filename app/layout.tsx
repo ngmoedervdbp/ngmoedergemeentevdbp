@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Source_Sans_3, Spectral } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/seo";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
@@ -16,6 +17,7 @@ const spectral = Spectral({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Lidmaatbestuur · NG Moedergemeente",
     template: "%s · NG Moedergemeente",

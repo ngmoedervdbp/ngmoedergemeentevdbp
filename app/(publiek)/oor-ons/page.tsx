@@ -1,19 +1,17 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { Geskiedenis } from "@/components/publiek/geskiedenis";
 import { GEMEENTE } from "@/lib/gemeente";
 
-export const metadata: Metadata = {
-  title: "Oor ons",
-  description:
-    "Die NG Moedergemeente Vanderbijlpark is in 1949 gestig — die moedergemeente van al die NG gemeentes in die dorp.",
-};
+export const metadata = publicPageMetadata("/oor-ons");
 
 export default function OorOnsBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/oor-ons" />
       <PubliekKop
         oortitel="Oor ons"
         titel="Die gemeente waaruit die ander gekom het"

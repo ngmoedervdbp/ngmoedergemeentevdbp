@@ -1,12 +1,9 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { RegistreerVorm } from "./registreer-vorm";
 
-export const metadata: Metadata = {
-  title: "Word deel van ons",
-  description:
-    "Laat jou besonderhede by die NG Moedergemeente Vanderbijlpark en die kerkkantoor tree met jou in verbinding.",
-};
+export const metadata = publicPageMetadata("/registreer");
 
 /**
  * DIE APP SE ENIGSTE PUBLIEKE SKRYFROETE.
@@ -18,6 +15,7 @@ export const metadata: Metadata = {
 export default function RegistreerBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/registreer" />
       <PubliekKop
         oortitel="Word deel van ons"
         titel="Ons wil jou graag leer ken"

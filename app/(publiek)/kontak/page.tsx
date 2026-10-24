@@ -1,14 +1,11 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import Link from "next/link";
 import { ArrowRight, Globe, MapPin, Navigation } from "lucide-react";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { GEMEENTE } from "@/lib/gemeente";
 
-export const metadata: Metadata = {
-  title: "Kontak",
-  description:
-    "Waar om ons te kry: h/v Faraday en Pasteur Boulevard, Vanderbijlpark.",
-};
+export const metadata = publicPageMetadata("/kontak");
 
 const KAART_SOEK = encodeURIComponent(
   `${GEMEENTE.adres.straat}, ${GEMEENTE.adres.dorp}`,
@@ -17,10 +14,11 @@ const KAART_SOEK = encodeURIComponent(
 export default function KontakBladsy() {
   return (
     <>
+      <PublicPageStructuredData path="/kontak" />
       <PubliekKop
         oortitel="Kontak"
-        titel="Kom kuier by ons"
-        leiding="Ons kerkgebou staan sedert 1960 op die hoek van Faraday en Pasteur Boulevard."
+        titel="Kry ons in Vanderbijlpark"
+        leiding="Kom kuier by NG Moedergemeente in die Vaaldriehoek. Ons kerkgebou staan op die hoek van Faraday en Pasteur Boulevard in Vanderbijlpark, Gauteng."
       />
 
       <section className="site-content">

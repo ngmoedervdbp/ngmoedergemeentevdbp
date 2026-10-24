@@ -159,7 +159,7 @@ export async function Bento() {
             gaan jou vra om op te staan nie.
           </p>
         </div>
-        <Link href="/eredienste" className="site-text-link">
+        <Link href="/nuut-hier" className="site-text-link">
           Wat om te verwag <ArrowUpRight size={18} aria-hidden />
         </Link>
       </div>

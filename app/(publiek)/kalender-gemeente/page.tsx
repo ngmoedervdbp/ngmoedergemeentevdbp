@@ -1,15 +1,12 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/seo";
+import { PublicPageStructuredData } from "@/components/publiek/structured-data";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { PubliekKop } from "@/components/publiek/bladsy-kop";
 import { komendePubliek } from "@/lib/publieke-kalender";
 import { fmtDatum } from "@/lib/format";
 import { GLAS } from "@/lib/glas";
 
-export const metadata: Metadata = {
-  title: "Kalender",
-  description:
-    "Eredienste, byeenkomste en spesiale geleenthede by die NG Moedergemeente Vanderbijlpark.",
-};
+export const metadata = publicPageMetadata("/kalender-gemeente");
 
 /** 'n Toon per kategorie, sodat die lys op 'n oogopslag leesbaar is. */
 const TOON: Record<string, { kleur: string; was: string; etiket: string }> = {
@@ -37,6 +34,7 @@ export default async function KalenderBladsy() {
 
   return (
     <>
+      <PublicPageStructuredData path="/kalender-gemeente" />
       <PubliekKop
         oortitel="Kalender"
         titel="Wat by ons gebeur"

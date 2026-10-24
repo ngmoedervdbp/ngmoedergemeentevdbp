@@ -17,6 +17,9 @@ const PUBLIEKE_ROETES = [
   "/kalender-gemeente",
   "/bedienings",
   "/kontak",
+  "/nuut-hier",
+  "/bybelstudie",
+  "/vrae",
   // Skryf-alleen registrasie, plus die kerkraad se aanteken-vloei.
   "/registreer",
   "/teken-in",
@@ -37,6 +40,15 @@ function isPubliek(pathname: string) {
 let gewaarsku = false;
 
 export async function proxy(request: NextRequest) {
+  // Search discovery and share images must work without a session or Supabase.
+  if (
+    ["/sitemap.xml", "/robots.txt", "/opengraph-image"].includes(
+      request.nextUrl.pathname,
+    )
+  ) {
+    return NextResponse.next({ request });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

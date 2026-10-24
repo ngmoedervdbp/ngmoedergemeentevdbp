@@ -34,7 +34,7 @@ export function PubliekVoet() {
               </span>
             </Link>
             <p>
-              &apos;n Gemeente in die hart van Vanderbijlpark sedert{" "}
+              &apos;n NG gemeente in Vanderbijlpark, in die Vaaldriehoek, sedert{" "}
               {GEMEENTE.gestig}. Almal is welkom.
             </p>
           </div>
@@ -63,7 +63,12 @@ export function PubliekVoet() {
             <h2>Skakels</h2>
             {[
               { label: "Eredienste", href: "/eredienste" },
+              { label: "Nuut hier?", href: "/nuut-hier" },
+              { label: "Bybelstudie", href: "/bybelstudie" },
+              { label: "Vrae en antwoorde", href: "/vrae" },
               { label: "Oor ons", href: "/oor-ons" },
+              { label: "Gemeentekalender", href: "/kalender-gemeente" },
+              { label: "Bedienings", href: "/bedienings" },
               { label: "Word deel van ons", href: "/registreer" },
               { label: "Kontak", href: "/kontak" },
             ].map((link) => (

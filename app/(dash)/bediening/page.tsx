@@ -6,7 +6,6 @@ import { StatTeel } from "@/components/kerk/stat-teel";
 import {
   aktiwiteiteHierdieWeek,
   bedieningOorsig,
-  tellingPerTipe,
 } from "@/lib/data/bediening-afleidings";
 import { haalAfsprake, haalAktiwiteite } from "@/lib/data/bediening-data";
 import { BedieningAansig } from "./bediening-aansig";
@@ -36,7 +35,6 @@ export default async function BedieningBladsy() {
 
   const week = aktiwiteiteHierdieWeek(lys);
   const oorsig = bedieningOorsig(lys);
-  const perTipe = tellingPerTipe(lys);
 
   return (
     <>
@@ -79,8 +77,6 @@ export default async function BedieningBladsy() {
       <BedieningAansig
         aktiwiteite={lys}
         afsprake={afsprakeLys}
-        perTipe={perTipe}
-        oorsig={oorsig}
       />
     </>
   );

@@ -12,6 +12,8 @@ import {
   stoorWyk,
 } from "@/lib/data/aksies";
 import type { Family, Wyk } from "@/lib/tipes/gemeente";
+import { useReportExport } from "@/components/kerk/report-export";
+import type { ReportFormat } from "@/lib/reports/model";
 
 /* ---------------------------------------------------------------
    Bevestig — een dialoog vir elke ja/nee-aksie
@@ -246,29 +248,32 @@ export function GebeurtenisModaal({ oop, sluit }: { oop: boolean; sluit: () => v
    --------------------------------------------------------------- */
 
 export function UitvoerModaal({
-  oop, sluit, aantal, wat = "lidmate",
-}: { oop: boolean; sluit: () => void; aantal: number; wat?: string }) {
-  const { wys } = useMelding();
+  oop, sluit, aantal, wat = "lidmate", omvang = "almal",
+}: { oop: boolean; sluit: () => void; aantal: number; wat?: string; omvang?: "aktief" | "almal" }) {
+  const [formaat, setFormaat] = useState<ReportFormat>("xlsx");
+  const { busy, download } = useReportExport();
   return (
     <Modaal oop={oop} sluit={sluit} titel="Voer uit" breedte="sm"
       beskrywing={`${aantal} ${wat} sal uitgevoer word.`}
       voet={
         <>
           <Knop soort="stil" onClick={sluit}>Kanselleer</Knop>
-          <Knop soort="primer" ikoon={Download}
-            onClick={() => { wys("Uitvoer is nog nie gebou nie.", "info"); sluit(); }}>
-            Laai af
+          <Knop soort="primer" ikoon={Download} disabled={busy} aria-busy={busy}
+            onClick={async () => { if (await download({ formaat, omvang })) sluit(); }}>
+            {busy ? "Berei voor…" : "Laai af"}
           </Knop>
         </>
       }>
       <div className="flex flex-col gap-4">
         <Veld etiket="Formaat">
-          <Kies defaultValue="xlsx">
+          <Kies value={formaat} onChange={(event) => setFormaat(event.target.value as ReportFormat)} disabled={busy}>
             <option value="xlsx">Excel (.xlsx)</option>
             <option value="csv">CSV (.csv)</option>
             <option value="pdf">PDF</option>
+            <option value="docx">Word (.docx)</option>
           </Kies>
         </Veld>
+        <p className="text-ink-muted text-xs">Excel, PDF en Word bevat die oorsig en register. CSV bevat die register as &apos;n enkele tabel.</p>
         <div className="border-line bg-was-wyn/40 rounded-lg border px-3.5 py-2.5 text-xs">
           <strong className="font-semibold">POPIA:</strong> die lêer bevat persoonlike
           besonderhede van werklike gesinne. Moenie dit per e-pos aanstuur of op &apos;n

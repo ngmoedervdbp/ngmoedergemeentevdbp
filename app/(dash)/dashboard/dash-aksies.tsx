@@ -3,18 +3,16 @@ import { useState } from "react";
 import { FileText, UserPlus } from "lucide-react";
 import { Knop } from "@/components/ui/basis";
 import { LidmaatModaal } from "@/components/modale/lidmaat-modaal";
-import { useMelding } from "@/components/ui/melding";
+import { ReportExportButton } from "@/components/kerk/report-export";
 
 export function DashAksies() {
   const [oop, setOop] = useState(false);
-  const { wys } = useMelding();
   return (
     <>
       <Knop ikoon={UserPlus} grootte="sm" onClick={() => setOop(true)}>Voeg lidmaat by</Knop>
-      <Knop soort="primer" ikoon={FileText} grootte="sm"
-        onClick={() => wys("PDF-uitvoer is nog nie gebou nie.", "info")}>
+      <ReportExportButton soort="primer" ikoon={FileText} options={{ formaat: "pdf" }}>
         Lidmateverslag
-      </Knop>
+      </ReportExportButton>
       <LidmaatModaal oop={oop} sluit={() => setOop(false)} />
     </>
   );

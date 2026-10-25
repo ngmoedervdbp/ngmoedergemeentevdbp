@@ -114,7 +114,7 @@ export function Modaal({
         className={cn(
           // Op 'n foon 'n bodemblad: dit kom uit die duim se rigting, en die
           // voetknoppies bly binne bereik. Van `sm` af 'n gewone dialoog.
-          "ui-modal border-line bg-surface flex max-h-[92dvh] w-full flex-col rounded-t-2xl border shadow-[0_28px_70px_-20px_rgba(20,19,32,0.5)] outline-none sm:max-h-full sm:rounded-xl",
+          "ui-modal border-line bg-surface flex min-w-0 max-h-[92dvh] w-full flex-col rounded-t-2xl border shadow-[0_28px_70px_-20px_rgba(20,19,32,0.5)] outline-none sm:max-h-full sm:rounded-xl",
           BREEDTES[breedte],
         )}
       >

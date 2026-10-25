@@ -2,15 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { Download, FileText, Printer } from "lucide-react";
-import { Knop, Paneel, PaneelKop } from "@/components/ui/basis";
-import { useMelding } from "@/components/ui/melding";
+import { Paneel, PaneelKop } from "@/components/ui/basis";
+import { ReportExportButton } from "@/components/kerk/report-export";
+import { filterActivities, reportRange, type ReportPeriod } from "@/lib/reports/model";
+import { bedieningOorsig, tellingPerTipe } from "@/lib/data/bediening-afleidings";
 import { BEDIENING_TIPES } from "@/lib/bediening";
 import { GLAS } from "@/lib/glas";
 import { fmtDatum, fmtGetal } from "@/lib/format";
 import type { BedieningAktiwiteit, BedieningTipe } from "@/lib/tipes/bediening";
 import { cn } from "@/lib/utils";
 
-type Tydperk = "vandag" | "week" | "maand" | "dae30";
+type Tydperk = ReportPeriod;
 
 const TYDPERKE: { sleutel: Tydperk; etiket: string; dae: number }[] = [
   { sleutel: "vandag", etiket: "Vandag", dae: 0 },
@@ -21,23 +23,14 @@ const TYDPERKE: { sleutel: Tydperk; etiket: string; dae: number }[] = [
 
 export function BedieningVerslae({
   aktiwiteite,
-  perTipe,
-  oorsig,
 }: {
   aktiwiteite: BedieningAktiwiteit[];
-  perTipe: { tipe: BedieningTipe; aantal: number; persentasie: number }[];
-  oorsig: { totaal: number; totaleUre: number; liggings: number; perWeek: number };
 }) {
   const [tydperk, setTydperk] = useState<Tydperk>("dae30");
-  const { wys } = useMelding();
-
-  const reeks = useMemo(() => {
-    const datums = aktiwiteite.map((a) => a.datum).sort();
-    return {
-      van: datums[0] ?? null,
-      tot: datums[datums.length - 1] ?? null,
-    };
-  }, [aktiwiteite]);
+  const selected = useMemo(() => filterActivities(aktiwiteite, tydperk), [aktiwiteite, tydperk]);
+  const perTipe = tellingPerTipe(selected);
+  const oorsig = bedieningOorsig(selected);
+  const reeks = reportRange(tydperk);
 
   return (
     <div className="flex flex-col gap-4">
@@ -45,30 +38,32 @@ export function BedieningVerslae({
         <PaneelKop titel="Verslae" />
         <div className="flex flex-col gap-4 p-4 sm:p-5">
           <div className="flex flex-wrap gap-2">
-            <Knop
+            <ReportExportButton
               soort="sekonder"
               grootte="sm"
               ikoon={Printer}
-              onClick={() => wys("Druk is nog nie gebou nie.", "info")}
+              options={{ verslag: "bediening", formaat: "print", tydperk }}
             >
               Druk
-            </Knop>
-            <Knop
+            </ReportExportButton>
+            <ReportExportButton
               soort="sekonder"
               grootte="sm"
               ikoon={Download}
-              onClick={() => wys("Word-uitvoer is nog nie gebou nie.", "info")}
+              options={{ verslag: "bediening", formaat: "docx", tydperk }}
             >
               Word
-            </Knop>
-            <Knop
+            </ReportExportButton>
+            <ReportExportButton
               soort="sekonder"
               grootte="sm"
               ikoon={FileText}
-              onClick={() => wys("PDF-uitvoer is nog nie gebou nie.", "info")}
+              options={{ verslag: "bediening", formaat: "pdf", tydperk }}
             >
               PDF
-            </Knop>
+            </ReportExportButton>
+            <ReportExportButton options={{ verslag: "bediening", formaat: "xlsx", tydperk }}>Excel</ReportExportButton>
+            <ReportExportButton options={{ verslag: "bediening", formaat: "csv", tydperk }}>CSV</ReportExportButton>
           </div>
 
           <div className="scrollbar-none -mx-1 flex gap-2 overflow-x-auto overflow-y-hidden px-1 pb-1">
@@ -91,9 +86,9 @@ export function BedieningVerslae({
           </div>
 
           <p className="text-ink-muted text-sm">
-            {reeks.van ? (
+            {selected.length ? (
               <>
-                {fmtDatum(reeks.van)} tot {fmtDatum(reeks.tot)} —{" "}
+                {fmtDatum(reeks.from)} tot {fmtDatum(reeks.to)} —{" "}
                 <strong className="text-ink font-semibold">
                   {oorsig.totaal} aktiwiteite
                 </strong>{" "}
@@ -105,6 +100,12 @@ export function BedieningVerslae({
           </p>
         </div>
       </Paneel>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-live="polite">
+        {[{ label: "Aktiwiteite", value: oorsig.totaal }, { label: "Totale ure", value: oorsig.totaleUre }, { label: "Liggings", value: oorsig.liggings }, { label: "Per week (gem.)", value: oorsig.perWeek }].map((metric) => (
+          <Paneel key={metric.label} className="p-4"><p className="text-ink-muted text-xs">{metric.label}</p><p className="text-brand mt-1 text-2xl font-semibold tabular">{fmtGetal(metric.value)}</p></Paneel>
+        ))}
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Paneel>

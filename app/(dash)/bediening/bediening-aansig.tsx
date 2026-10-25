@@ -17,7 +17,6 @@ import { AktiwiteitModaal } from "@/components/modale/aktiwiteit-modaal";
 import type {
   Afspraak,
   BedieningAktiwiteit,
-  BedieningTipe,
 } from "@/lib/tipes/bediening";
 import { AktiwiteitLys } from "./aktiwiteit-lys";
 import { BedieningVerslae } from "./bediening-verslae";
@@ -38,18 +37,9 @@ const OORTJIES: OortjieItem<Oortjie>[] = [
 export function BedieningAansig({
   aktiwiteite,
   afsprake,
-  perTipe,
-  oorsig,
 }: {
   aktiwiteite: BedieningAktiwiteit[];
   afsprake: Afspraak[];
-  perTipe: { tipe: BedieningTipe; aantal: number; persentasie: number }[];
-  oorsig: {
-    totaal: number;
-    totaleUre: number;
-    liggings: number;
-    perWeek: number;
-  };
 }) {
   const [oortjie, setOortjie] = useState<Oortjie>("aktiwiteite");
   const [modaalOop, setModaalOop] = useState(false);
@@ -97,8 +87,6 @@ export function BedieningAansig({
         {oortjie === "verslae" ? (
           <BedieningVerslae
             aktiwiteite={aktiwiteite}
-            perTipe={perTipe}
-            oorsig={oorsig}
           />
         ) : null}
 

@@ -7,21 +7,19 @@ import { Knop } from "@/components/ui/basis";
 import { Modaal } from "@/components/ui/modaal";
 import { UitvoerModaal } from "@/components/modale/algemene-modale";
 import { LidmaatAvatar } from "@/components/kerk/lidmaat-avatar";
-import { useMelding } from "@/components/ui/melding";
+import { ReportExportButton } from "@/components/kerk/report-export";
 import { type Lid } from "@/lib/tipes/gemeente";
 import { volleNaam } from "@/lib/data/afleidings";
 
 export function VerslagAksies({ aantal }: { aantal: number }) {
   const [oop, setOop] = useState<"uitvoer" | null>(null);
-  const { wys } = useMelding();
   return (
     <>
       <Knop ikoon={Download} grootte="sm" onClick={() => setOop("uitvoer")}>Uitvoer</Knop>
-      <Knop soort="primer" ikoon={FileText} grootte="sm"
-        onClick={() => wys("PDF-uitvoer is nog nie gebou nie.", "info")}>
+      <ReportExportButton soort="primer" ikoon={FileText} options={{ formaat: "pdf" }}>
         Volledige lidmateverslag
-      </Knop>
-      <UitvoerModaal oop={oop === "uitvoer"} sluit={() => setOop(null)} aantal={aantal} />
+      </ReportExportButton>
+      <UitvoerModaal oop={oop === "uitvoer"} sluit={() => setOop(null)} aantal={aantal} omvang="aktief" />
     </>
   );
 }

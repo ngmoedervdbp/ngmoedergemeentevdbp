@@ -52,7 +52,7 @@ export function Oortjies<T extends string>({
     <div
       role="tablist"
       aria-label={etiket}
-      className="ui-tabs border-line scrollbar-none flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b pb-px"
+      className="ui-tabs border-line scrollbar-none flex min-w-0 max-w-full items-center gap-1 overflow-x-auto overflow-y-hidden border-b pb-px"
     >
       {items.map((o, i) => {
         const aan = o.sleutel === aktief;

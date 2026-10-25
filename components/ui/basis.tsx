@@ -149,7 +149,7 @@ export function Paneel({
   return (
     <section
       className={cn(
-        "ui-panel border-line bg-surface rounded-xl border shadow-[0_1px_2px_rgba(34,31,38,0.04)]",
+        "ui-panel border-line bg-surface min-w-0 rounded-xl border shadow-[0_1px_2px_rgba(34,31,38,0.04)]",
         className,
       )}
       {...res}

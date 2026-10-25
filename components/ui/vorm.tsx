@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * gee — vandaar die uitdruklike 16px.
  */
 const INSET =
-  "ui-input border-line bg-surface text-ink placeholder:text-ink-muted focus-visible:outline-accent w-full rounded-lg border px-3 text-[16px] sm:text-sm focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:opacity-60";
+  "ui-input border-line bg-surface text-ink placeholder:text-ink-muted focus-visible:outline-accent min-w-0 max-w-full w-full rounded-lg border px-3 text-[16px] sm:text-sm focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:opacity-60";
 
 export function Veld({
   etiket,
@@ -94,5 +94,5 @@ export function Teksarea({ className, ...res }: ComponentProps<"textarea">) {
 
 /** Twee velde langs mekaar op groter skerms. */
 export function VeldRy({ children }: { children: ReactNode }) {
-  return <div className="grid gap-4 sm:grid-cols-2">{children}</div>;
+  return <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">{children}</div>;
 }

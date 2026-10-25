@@ -197,6 +197,37 @@ body {
   color: var(--color-ink);
 }
 
+/* Native date controls have an intrinsic minimum width in mobile Safari.
+   Let the input and its fieldset shrink within narrow grids and dialogs. */
+fieldset {
+  min-inline-size: 0;
+}
+.ui-input:is([type="date"], [type="time"], [type="datetime-local"]) {
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  inline-size: 100%;
+}
+.ui-input::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+.ui-input::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
+}
+.admin-page-actions > .knop {
+  min-width: 0;
+  height: auto;
+  min-height: 2.25rem;
+  padding-block: 0.5rem;
+  white-space: normal;
+  text-align: center;
+}
+.admin-page-actions > .knop > svg {
+  flex-shrink: 0;
+}
+
 /*
  * Versteek 'n rolstaaf sonder om rol te verhinder.
  *

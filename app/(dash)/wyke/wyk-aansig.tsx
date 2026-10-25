@@ -12,6 +12,7 @@ import { Tabelrol } from "@/components/ui/tabel";
 import { type Lid, type Wyk } from "@/lib/tipes/gemeente";
 import { volleNaam } from "@/lib/data/afleidings";
 import { cn } from "@/lib/utils";
+import { ReportExportButton } from "@/components/kerk/report-export";
 
 type WykMetLede = Wyk & { tel: number; lede: Lid[] };
 type Aansig = "kaarte" | "lys";
@@ -38,9 +39,9 @@ export function WykAansig({ wyke }: { wyke: WykMetLede[] }) {
 
         <div className="ml-auto flex w-full flex-wrap gap-2 sm:w-auto [&>*]:flex-1 sm:[&>*]:flex-none">
           <Knop ikoon={Shuffle} grootte="sm" onClick={() => setVerdeel(true)}>Verdeel lidmate</Knop>
-          <Knop ikoon={Printer} grootte="sm" onClick={() => wys("Druk is nog nie gebou nie.", "info")}>
+          <ReportExportButton ikoon={Printer} options={{ verslag: "wyke", formaat: "print" }}>
             Druk wyklys
-          </Knop>
+          </ReportExportButton>
           <Knop soort="primer" ikoon={Plus} grootte="sm" onClick={() => setNuut(true)}>Nuwe wyk</Knop>
         </div>
       </div>

@@ -16,6 +16,8 @@ export type Rol = "admin" | "dominee" | "skriba" | "ouderling" | "kerkraad";
 export type Gebruiker = {
   id: string;
   naam: string;
+  /** Vir die groet. Val terug op `naam` as die profiel nog geen voornaam het nie. */
+  voornaam: string;
   epos: string;
   rol: Rol;
   /** Slegs vir 'n wyksouderling — nog nie afgedwing nie. */
@@ -35,6 +37,7 @@ function heltSupabase() {
 const SPOTGEBRUIKER: Gebruiker = {
   id: "u1",
   naam: "Tiaan Botha",
+  voornaam: "Tiaan",
   epos: "dev2@startechgroup.co.za",
   rol: "dominee",
   wyk_id: null,
@@ -131,6 +134,7 @@ export async function huidigeGebruiker(): Promise<Gebruiker | null> {
   return {
     id: data.id,
     naam: naam || (data.epos ?? "Kerkraadslid"),
+    voornaam: data.first_name || naam || "Kerkraadslid",
     epos: data.epos ?? user.email ?? "",
     rol: data.rol,
     wyk_id: data.wyk_id,

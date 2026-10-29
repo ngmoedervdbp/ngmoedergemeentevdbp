@@ -27,6 +27,7 @@ import {
   PaneelKop,
 } from "@/components/ui/basis";
 import { fmtDatum, fmtMaandJaar } from "@/lib/format";
+import { huidigeGebruiker } from "@/lib/sessie";
 import {
   groeiPerMaand,
   komendeGebeurtenisse,
@@ -60,10 +61,11 @@ const KATEGORIE_ETIKET = {
 export const dynamic = "force-dynamic";
 
 export default async function DashboardBladsy() {
-  const [LEDE, GEBEURTENISSE, REGISTRASIES] = await Promise.all([
+  const [LEDE, GEBEURTENISSE, REGISTRASIES, gebruiker] = await Promise.all([
     haalLede(),
     haalGebeurtenisse(),
     haalRegistrasieRye(),
+    huidigeGebruiker(),
   ]);
 
   const o = ouderdomsOorsig(LEDE);
@@ -85,7 +87,7 @@ export default async function DashboardBladsy() {
         </p>
         <BladsyKop
           titel="Dashboard"
-          beskrywing="Welkom terug, Tiaan. Hier is 'n oorsig van die gemeente."
+          beskrywing={`Welkom terug${gebruiker ? `, ${gebruiker.voornaam}` : ""}. Hier is 'n oorsig van die gemeente.`}
           aksies={<DashAksies />}
         />
       </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GEMEENTE } from "@/lib/gemeente";
+import { IS_DEMO } from "@/lib/demo";
 
 // Keep the church's custom domain canonical, including on Vercel previews.
 const configuredUrl =
@@ -10,7 +11,10 @@ if (!["https:", "http:"].includes(siteUrl.protocol)) {
 }
 
 export const SITE_URL = siteUrl.origin;
+// The demo deploys as Vercel "production" in its own project, so VERCEL_ENV alone
+// would let Google index it as a second copy of the church site.
 export const IS_PREVIEW =
+  IS_DEMO ||
   process.env.VERCEL_ENV === "preview" ||
   process.env.VERCEL_ENV === "development";
 

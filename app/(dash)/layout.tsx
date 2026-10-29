@@ -1,9 +1,12 @@
+import Link from "next/link";
+import { FlaskConical } from "lucide-react";
 import { Skil } from "@/components/kerk/skil";
 import { MeldingVerskaffer } from "@/components/ui/melding";
 import { navHrefsVir } from "@/lib/nav";
 import { huidigeGebruiker, ROL_ETIKET } from "@/lib/sessie";
 import { haalLede } from "@/lib/data/gemeente-data";
 import { werkruimteFont } from "@/lib/werkruimte-font";
+import { IS_DEMO } from "@/lib/demo";
 import "@/components/kerk/admin.css";
 
 /**
@@ -30,10 +33,26 @@ export default async function DashLayout({ children }: LayoutProps<"/">) {
           lede={lede}
           gebruiker={gebruiker?.naam ?? "Gas"}
           rolEtiket={gebruiker ? ROL_ETIKET[gebruiker.rol] : ""}
+          banier={IS_DEMO ? <DemoBanier /> : null}
         >
           {children}
         </Skil>
       </MeldingVerskaffer>
     </div>
+  );
+}
+
+/** Sodat niemand ooit dink die demo is die regte stelsel nie. */
+function DemoBanier() {
+  return (
+    <p className="border-line bg-was-amber text-glas-amber veilig-kant flex shrink-0 items-center justify-center gap-2 border-b px-4 py-1.5 text-center text-xs font-semibold">
+      <FlaskConical size={13} className="shrink-0" aria-hidden />
+      <span className="text-pretty">
+        Demo — jou eie speelruimte. Niemand anders sien jou data nie.{" "}
+        <Link href="/instellings" className="underline underline-offset-2">
+          Speel as &apos;n ander rol
+        </Link>
+      </span>
+    </p>
   );
 }

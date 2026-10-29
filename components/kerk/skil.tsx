@@ -25,12 +25,15 @@ export function Skil({
   lede,
   gebruiker,
   rolEtiket,
+  banier,
   children,
 }: {
   navHrefs: string[];
   lede: Lid[];
   gebruiker: string;
   rolEtiket: string;
+  /** Vaste strook onder die bo-balk — die demo se waarskuwing. */
+  banier?: ReactNode;
   children: ReactNode;
 }) {
   const [navOop, setNavOop] = useState(false);
@@ -56,6 +59,7 @@ export function Skil({
           rolEtiket={rolEtiket}
           openNav={() => setNavOop(true)}
         />
+        {banier}
         <main
           ref={main}
           id="admin-inhoud"

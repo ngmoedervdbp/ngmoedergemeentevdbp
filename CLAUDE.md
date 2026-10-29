@@ -466,6 +466,22 @@ docs/base44-reference/      # screenshots + inventory of the app we're replacing
 Components and files are named in Afrikaans (`sy-balk`, `bladsy-kop`), matching the
 enum-value rule — they're domain vocabulary. Library-facing identifiers stay English.
 
+### Kerkraad demo (temporary)
+
+A separate Vercel project + separate Supabase project where ~10 testers each get an
+isolated, empty sandbox. **Not how production works** — production is one shared
+congregation. Full setup: [supabase/demo/LEES-MY.md](supabase/demo/LEES-MY.md).
+
+- `NEXT_PUBLIC_DEMO=1` ([lib/demo.ts](lib/demo.ts)) only switches on UI: banner,
+  "Speel as" role switcher, sandbox reset, personal registration link, `noindex`.
+  Never set it on production.
+- The isolation itself is RLS in `supabase/demo/speelruimtes.sql` (`speelruimte_id`
+  defaulting to `auth.uid()` on every shared table). It is deliberately **outside**
+  `supabase/migrations/`. Re-run it on the demo DB after every new migration — a
+  migration that recreates policies would otherwise silently undo the isolation.
+- A new shared table needs adding to that file's table list, or testers will see
+  each other's rows in it.
+
 ### Dev-only auth bypass
 
 [proxy.ts](proxy.ts) lets requests through when the Supabase env vars are missing, so the

@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, TriangleAlert } from "lucide-react";
 import { KruisLaaier } from "@/components/ui/kruis-laaier";
 import { Invoer, Kies, Teksarea, Veld, VeldRy } from "@/components/ui/vorm";
+import { IS_DEMO } from "@/lib/demo";
 import { stuurRegistrasie, type RegistrasieUitslag } from "./aksies";
 
 /**
@@ -150,6 +152,14 @@ export function RegistreerVorm() {
         </label>
       </div>
 
+      {/* Net in die demo. Buite die demo word dit nooit gelewer nie, so
+          useSearchParams trek die bladsy nie uit statiese lewering nie. */}
+      {IS_DEMO ? (
+        <Suspense>
+          <DemoSpeelruimte />
+        </Suspense>
+      ) : null}
+
       <StuurKnop />
     </form>
   );
@@ -192,4 +202,13 @@ function StuurKnop() {
       </p>
     </div>
   );
+}
+
+/**
+ * Die demo se registrasieskakel dra die toetser se speelruimte (`?s=<id>`) —
+ * die publieke vorm het geen sessie om dit uit af te lei nie.
+ */
+function DemoSpeelruimte() {
+  const s = useSearchParams().get("s") ?? "";
+  return <input type="hidden" name="speelruimte" value={s} />;
 }

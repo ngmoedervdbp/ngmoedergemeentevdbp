@@ -1,9 +1,11 @@
 "use server";
 
 import { headers } from "next/headers";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { leesVorm } from "@/lib/registrasie-skema";
 import { klientIP, tempoKontrole } from "@/lib/tempo";
+import { IS_DEMO } from "@/lib/demo";
 
 /**
  * Die app se enigste publieke skryfaksie.
@@ -63,12 +65,27 @@ export async function stuurRegistrasie(
     };
   }
 
+  // In die demo moet die ry in 'n toetser se speelruimte beland. Die skakel
+  // in Instellings dra dit; RLS weier 'n ry sonder een.
+  let speelruimte: { speelruimte_id: string } | undefined;
+  if (IS_DEMO) {
+    const id = z.uuid().safeParse(data.get("speelruimte"));
+    if (!id.success) {
+      return {
+        ok: false,
+        boodskap:
+          "Dit is die demo. Gebruik jou persoonlike registrasieskakel uit Instellings.",
+      };
+    }
+    speelruimte = { speelruimte_id: id.data };
+  }
+
   // 4. Invoeg.
   try {
     const supabase = await createClient();
     const { error } = await supabase
       .from("pending_registrations")
-      .insert(uitslag.data);
+      .insert({ ...uitslag.data, ...speelruimte });
 
     if (error) {
       // Moenie die databasisfout deurgee nie — dit kan die skema verklap.
